@@ -6,7 +6,7 @@
 /*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 14:25:23 by cpoulain          #+#    #+#             */
-/*   Updated: 2025/11/24 16:49:25 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/24 18:12:29 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,8 @@ void init_arg_parser(
 	parser->positional_defs[0] = (Positional){0};
 	parser->positional_args[0] = NULL;
 	parser->program_name = strdup(program_name);
+	parser->last_error = ARGPARSE_OK;
+	parser->last_error_arg = NULL;
 }
 
 ArgParseResult add_option(
@@ -52,7 +54,7 @@ ArgParseResult add_option(
 	const Option *opt_def)
 {
 	if (parser->option_count >= MAX_OPTIONS)
-		return ARGPARSE_ERR_TOO_MANY_OPTIONS;
+		return (parser->last_error = ARGPARSE_ERR_TOO_MANY_OPTIONS);
 
 	Option *dst = &parser->options[parser->option_count++];
 
@@ -63,12 +65,12 @@ ArgParseResult add_option(
 	if ((opt_def->short_flag && !dst->short_flag) ||
 		(opt_def->long_flag && !dst->long_flag) ||
 		(opt_def->description && !dst->description))
-		return ARGPARSE_ERR_ALLOC;
+		return (parser->last_error = ARGPARSE_ERR_ALLOC);
 
 	dst->type = opt_def->type;
 	dst->value = opt_def->value;
 
-	return ARGPARSE_OK;
+	return parser->last_error = ARGPARSE_OK;
 }
 
 ArgParseResult parse_arguments(
@@ -98,12 +100,18 @@ ArgParseResult parse_arguments(
 			ArgParseResult r = assign_option_value(opt, value_from_eq,
 												   argc, argv, &i);
 			if (r != ARGPARSE_OK)
-				return r;
+				return (parser->last_error = r,
+					 parser->last_error_arg = value_from_eq ? value_from_eq : argv[i],
+					 r);
 		}
 		else
 		{
+			if (argv[i][0] == '-' && (argv[i][1] != '\0' || parser->positional_count == parser->positional_def_count))
+				return (parser->last_error = ARGPARSE_ERR_UNKNOWN_OPTION,
+					 parser->last_error_arg = argv[i],
+					 ARGPARSE_ERR_UNKNOWN_OPTION);
 			if (parser->positional_count >= MAX_POSITIONAL)
-				return ARGPARSE_ERR_TOO_MANY_POSITIONALS;
+				return (parser->last_error = ARGPARSE_ERR_TOO_MANY_POSITIONALS);
 			parser->positional_args[parser->positional_count++] = argv[i];
 		}
 	}
@@ -188,6 +196,41 @@ void print_usage(const ArgParser *parser)
 	}
 }
 
+ArgParseResult print_argparse_error(ArgParser *parser)
+{
+	fprintf(stderr, "%s: Error: ", parser->program_name);
+	if (parser->last_error == ARGPARSE_ERR_TOO_MANY_OPTIONS)
+		fprintf(stderr, "too many options defined\n\n");
+	else if (parser->last_error == ARGPARSE_ERR_TOO_MANY_POSITIONALS)
+		fprintf(stderr, "too many positional arguments defined\n\n");
+	else if (parser->last_error == ARGPARSE_ERR_MISSING_VALUE)
+		fprintf(stderr, "missing value for option %s\n\n", parser->last_error_arg ? parser->last_error_arg : "");
+	else if (parser->last_error == ARGPARSE_ERR_INVALID_INT)
+		fprintf(stderr, "invalid integer value %s\n\n", parser->last_error_arg);
+	else if (parser->last_error == ARGPARSE_ERR_ALLOC)
+		fprintf(stderr, "memory allocation failure\n\n");
+	else if (parser->last_error == ARGPARSE_ERR_UNKNOWN_OPTION)
+		fprintf(stderr, "unrecognized option -- '%s'\n\n", parser->last_error_arg);
+	else
+		fprintf(stderr, "unknown error\n\n");
+	return parser->last_error;
+}
+
+ArgParseResult add_options(
+	ArgParser *parser,
+	const Option *opts,
+	int count
+)
+{
+	for (int i = 0; i < count; ++i)
+	{
+		ArgParseResult r = add_option(parser, &opts[i]);
+		if (r != ARGPARSE_OK)
+			return (parser->last_error = r);
+	}
+	return parser->last_error = ARGPARSE_OK;
+}
+
 void free_arg_parser(ArgParser *parser)
 {
 	for (int i = 0; i < parser->option_count; ++i)
@@ -264,7 +307,7 @@ ArgParseResult add_positional(
 	int required)
 {
 	if (parser->positional_def_count >= MAX_POSITIONAL)
-		return ARGPARSE_ERR_TOO_MANY_POSITIONALS;
+		return (parser->last_error = ARGPARSE_ERR_TOO_MANY_POSITIONALS);
 
 	Positional *def = &parser->positional_defs[parser->positional_def_count++];
 	def->name = name;
@@ -353,7 +396,7 @@ static ArgParseResult bind_positionals(ArgParser *parser)
 	for (int i = 0; i < defs; ++i)
 	{
 		if (parser->positional_defs[i].required && i >= args)
-			return ARGPARSE_ERR_MISSING_VALUE;
+			return (parser->last_error_arg = (char *)parser->positional_defs[i].name, parser->last_error = ARGPARSE_ERR_MISSING_VALUE);
 	}
 	/* Bind actual values */
 	for (int i = 0; i < defs && i < args; ++i)
@@ -362,5 +405,5 @@ static ArgParseResult bind_positionals(ArgParser *parser)
 		if (def->value)
 			*(def->value) = parser->positional_args[i];
 	}
-	return ARGPARSE_OK;
+	return parser->last_error = ARGPARSE_OK;
 }

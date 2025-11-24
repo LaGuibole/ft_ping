@@ -1,22 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ping.h                                             :+:      :+:    :+:   */
+/*   error.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/11/24 15:12:26 by cpoulain          #+#    #+#             */
-/*   Updated: 2025/11/24 17:59:00 by cpoulain         ###   ########.fr       */
+/*   Created: 2025/11/24 17:24:28 by cpoulain          #+#    #+#             */
+/*   Updated: 2025/11/24 17:58:55 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PING_H
-# define PING_H
+#include "ping.h"
 
-#include "argparser.h"
-
-#define OPTION_COUNT 2
-
-void   exit_ping(ArgParser *parser, byte help);
-
-#endif
+void   exit_ping(ArgParser *parser, byte help)
+{
+    int exit_code = (parser->last_error != ARGPARSE_OK && !help ? parser->last_error : 0);
+    
+    exit_code ? print_argparse_error(parser) : print_usage(parser);
+    free_arg_parser(parser);
+    exit(exit_code);
+}

@@ -6,7 +6,7 @@
 /*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 15:12:36 by cpoulain          #+#    #+#             */
-/*   Updated: 2025/11/24 16:10:58 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/24 17:54:39 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,19 +47,6 @@ typedef struct s_positional
 	int         required;
 }   Positional;
 
-typedef struct s_argparser
-{
-	char        *program_name;
-	
-	Option      options[MAX_OPTIONS];
-	int         option_count;
-
-	char        *positional_args[MAX_POSITIONAL];
-	int         positional_count;
-
-	Positional  positional_defs[MAX_POSITIONAL];
-	int         positional_def_count;
-}   ArgParser;
 
 typedef enum e_argparse_result
 {
@@ -68,8 +55,26 @@ typedef enum e_argparse_result
 	ARGPARSE_ERR_TOO_MANY_POSITIONALS,
 	ARGPARSE_ERR_MISSING_VALUE,
 	ARGPARSE_ERR_INVALID_INT,
-	ARGPARSE_ERR_ALLOC
+	ARGPARSE_ERR_ALLOC,
+	ARGPARSE_ERR_UNKNOWN_OPTION
 }   ArgParseResult;
+
+typedef struct s_argparser
+{
+	char        	*program_name;
+		
+	Option      	options[MAX_OPTIONS];
+	int         	option_count;
+	
+	char        	*positional_args[MAX_POSITIONAL];
+	int         	positional_count;
+	
+	Positional  	positional_defs[MAX_POSITIONAL];
+	int         	positional_def_count;
+
+	ArgParseResult	last_error;
+	char			*last_error_arg;
+}   ArgParser;
 
 /* Core API */
 void            init_arg_parser(ArgParser *parser, const char *program_name);
@@ -77,6 +82,8 @@ ArgParseResult  add_option(ArgParser *parser, const Option *opt_def);
 ArgParseResult  parse_arguments(ArgParser *parser, int argc, char *argv[]);
 void            print_usage(const ArgParser *parser);
 void            free_arg_parser(ArgParser *parser);
+ArgParseResult	print_argparse_error(ArgParser *parser);
+ArgParseResult	add_options(ArgParser *parser, const Option *opts, int count);
 
 /* Option builders */
 
