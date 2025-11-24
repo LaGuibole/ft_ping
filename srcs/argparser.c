@@ -6,7 +6,7 @@
 /*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 14:25:23 by cpoulain          #+#    #+#             */
-/*   Updated: 2025/11/24 15:54:41 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/24 16:49:25 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,44 +36,45 @@ static ArgParseResult bind_positionals(
 
 void init_arg_parser(
 	ArgParser *parser,
-	const char *program_name
-)
+	const char *program_name)
 {
 	parser->option_count = 0;
 	parser->positional_count = 0;
+	parser->positional_def_count = 0;
+	parser->options[0] = (Option){0};
+	parser->positional_defs[0] = (Positional){0};
+	parser->positional_args[0] = NULL;
 	parser->program_name = strdup(program_name);
 }
 
 ArgParseResult add_option(
 	ArgParser *parser,
-	const Option *opt_def
-)
+	const Option *opt_def)
 {
-    if (parser->option_count >= MAX_OPTIONS)
-        return ARGPARSE_ERR_TOO_MANY_OPTIONS;
+	if (parser->option_count >= MAX_OPTIONS)
+		return ARGPARSE_ERR_TOO_MANY_OPTIONS;
 
-    Option *dst = &parser->options[parser->option_count++];
+	Option *dst = &parser->options[parser->option_count++];
 
-    dst->short_flag  = opt_def->short_flag  ? strdup(opt_def->short_flag)  : NULL;
-    dst->long_flag   = opt_def->long_flag   ? strdup(opt_def->long_flag)   : NULL;
-    dst->description = opt_def->description ? strdup(opt_def->description) : NULL;
+	dst->short_flag = opt_def->short_flag ? strdup(opt_def->short_flag) : NULL;
+	dst->long_flag = opt_def->long_flag ? strdup(opt_def->long_flag) : NULL;
+	dst->description = opt_def->description ? strdup(opt_def->description) : NULL;
 
-    if ((opt_def->short_flag  && !dst->short_flag) ||
-        (opt_def->long_flag   && !dst->long_flag)  ||
-        (opt_def->description && !dst->description))
-        return ARGPARSE_ERR_ALLOC;
+	if ((opt_def->short_flag && !dst->short_flag) ||
+		(opt_def->long_flag && !dst->long_flag) ||
+		(opt_def->description && !dst->description))
+		return ARGPARSE_ERR_ALLOC;
 
-    dst->type  = opt_def->type;
-    dst->value = opt_def->value;
+	dst->type = opt_def->type;
+	dst->value = opt_def->value;
 
-    return ARGPARSE_OK;
+	return ARGPARSE_OK;
 }
 
 ArgParseResult parse_arguments(
 	ArgParser *parser,
 	int argc,
-	char *argv[]
-)
+	char *argv[])
 {
 	for (int i = 1; i < argc; ++i)
 	{
@@ -111,84 +112,81 @@ ArgParseResult parse_arguments(
 
 void print_usage(const ArgParser *parser)
 {
-    int max_flag_len = 0;
-    int max_pos_name_len = 0;
-	char positional_buf[32*MAX_POSITIONAL] = {0};
+	int max_flag_len = 0;
+	int max_pos_name_len = 0;
+	char positional_buf[32 * MAX_POSITIONAL] = {0};
 
-	for (int i = 0; i < parser->positional_count; ++i)
+	for (int i = 0; i < parser->positional_def_count; ++i)
 	{
 		snprintf(positional_buf + strlen(positional_buf),
 				 sizeof(positional_buf) - strlen(positional_buf),
 				 " <%s>",
-				 parser->positional_defs[i].name ?
-				 parser->positional_defs[i].name : "arg");
+				 parser->positional_defs[i].name ? parser->positional_defs[i].name : "arg");
 	}
-	printf("Usage: %s [OPTIONS ...]", parser->program_name);
+	printf("Usage: %s%s [OPTIONS ...]\n", parser->program_name, positional_buf);
 
+	for (int i = 0; i < parser->option_count; ++i)
+	{
+		const Option *opt = &parser->options[i];
+		int len = 0;
 
-    for (int i = 0; i < parser->option_count; ++i)
-    {
-        const Option *opt = &parser->options[i];
-        int len = 0;
+		if (opt->short_flag)
+			len += (int)strlen(opt->short_flag);
+		if (opt->short_flag && opt->long_flag)
+			len += 2;
+		if (opt->long_flag)
+			len += (int)strlen(opt->long_flag);
+		if (len > max_flag_len)
+			max_flag_len = len;
+	}
 
-        if (opt->short_flag)
-            len += (int)strlen(opt->short_flag);
-        if (opt->short_flag && opt->long_flag)
-            len += 2;
-        if (opt->long_flag)
-            len += (int)strlen(opt->long_flag);
-        if (len > max_flag_len)
-            max_flag_len = len;
-    }
+	for (int i = 0; i < parser->positional_def_count; ++i)
+	{
+		const Positional *def = &parser->positional_defs[i];
+		int len = def->name ? (int)strlen(def->name) : 0;
+		if (len > max_pos_name_len)
+			max_pos_name_len = len;
+	}
 
-    for (int i = 0; i < parser->positional_def_count; ++i)
-    {
-        const Positional *def = &parser->positional_defs[i];
-        int len = def->name ? (int)strlen(def->name) : 0;
-        if (len > max_pos_name_len)
-            max_pos_name_len = len;
-    }
+	if (parser->option_count > 0)
+	{
+		printf("Options:\n");
+		for (int i = 0; i < parser->option_count; ++i)
+		{
+			const Option *opt = &parser->options[i];
+			char flags_buf[128] = {0};
 
-    if (parser->option_count > 0)
-    {
-        printf("Options:\n");
-        for (int i = 0; i < parser->option_count; ++i)
-        {
-            const Option *opt = &parser->options[i];
-            char flags_buf[128] = {0};
+			if (opt->short_flag && opt->long_flag)
+				snprintf(flags_buf, sizeof(flags_buf), "%s, %s",
+						 opt->short_flag, opt->long_flag);
+			else if (opt->short_flag)
+				snprintf(flags_buf, sizeof(flags_buf), "%s", opt->short_flag);
+			else if (opt->long_flag)
+				snprintf(flags_buf, sizeof(flags_buf), "    %s%s", opt->long_flag, opt->type == ARGTYPE_INT ? "=N" : "");
 
-            if (opt->short_flag && opt->long_flag)
-                snprintf(flags_buf, sizeof(flags_buf), "%s, %s",
-                         opt->short_flag, opt->long_flag);
-            else if (opt->short_flag)
-                snprintf(flags_buf, sizeof(flags_buf), "%s", opt->short_flag);
-            else if (opt->long_flag)
-                snprintf(flags_buf, sizeof(flags_buf), "%s", opt->long_flag);
+			printf("  %-*s", max_flag_len, flags_buf);
+			if (opt->description)
+				printf("  %s", opt->description);
+			printf("\n");
+		}
+	}
 
-            printf("  %-*s", max_flag_len, flags_buf);
-            if (opt->description)
-                printf("  %s", opt->description);
-            printf("\n");
-        }
-    }
-
-    if (parser->positional_def_count > 0)
-    {
-        printf("\nPositional arguments:\n");
-        for (int i = 0; i < parser->positional_def_count; ++i)
-        {
-            const Positional *def = &parser->positional_defs[i];
-            printf("  %-*s", max_pos_name_len,
-                   def->name ? def->name : "");
-            if (def->description)
-                printf("  %s", def->description);
-            if (def->required)
-                printf(" (required)");
-            printf("\n");
-        }
-    }
+	if (parser->positional_def_count > 0)
+	{
+		printf("\nPositional arguments:\n");
+		for (int i = 0; i < parser->positional_def_count; ++i)
+		{
+			const Positional *def = &parser->positional_defs[i];
+			printf("  %-*s", max_pos_name_len,
+				   def->name ? def->name : "");
+			if (def->description)
+				printf("  %s", def->description);
+			if (def->required)
+				printf(" (required)");
+			printf("\n");
+		}
+	}
 }
-
 
 void free_arg_parser(ArgParser *parser)
 {
@@ -217,17 +215,17 @@ Option build_option(
 	const char *long_flag,
 	ArgType type,
 	void *value,
-	const char *description
-)
+	const char *description)
 {
-	Option res = {
-		.short_flag = strdup(short_flag),
-		.long_flag = strdup(long_flag),
-		.type = type,
-		.value = value,
-		.description = strdup(description)
-	};
-	
+	Option res = {0};
+
+
+	res.short_flag = short_flag != NULL ? strdup(short_flag) : NULL;
+	res.long_flag = long_flag != NULL ? strdup(long_flag) : NULL;
+	res.type = type;
+	res.value = value;
+	res.description = description != NULL ? strdup(description) : NULL;
+
 	return res;
 }
 
@@ -235,8 +233,7 @@ Option build_flag_option(
 	const char *short_flag,
 	const char *long_flag,
 	byte *value,
-	const char *description
-)
+	const char *description)
 {
 	return build_option(short_flag, long_flag, ARGTYPE_FLAG, value, description);
 }
@@ -244,9 +241,8 @@ Option build_flag_option(
 Option build_int_option(
 	const char *short_flag,
 	const char *long_flag,
-	int	*value,
-	const char *description
-)
+	int *value,
+	const char *description)
 {
 	return build_option(short_flag, long_flag, ARGTYPE_INT, value, description);
 }
@@ -255,37 +251,34 @@ Option build_str_option(
 	const char *short_flag,
 	const char *long_flag,
 	char **value,
-	const char *description
-)
+	const char *description)
 {
 	return build_option(short_flag, long_flag, ARGTYPE_STRING, value, description);
 }
 
 ArgParseResult add_positional(
-    ArgParser *parser,
-    const char *name,
-    char **value,
-    const char *description,
-    int required
-)
+	ArgParser *parser,
+	const char *name,
+	char **value,
+	const char *description,
+	int required)
 {
-    if (parser->positional_def_count >= MAX_POSITIONAL)
-        return ARGPARSE_ERR_TOO_MANY_POSITIONALS;
+	if (parser->positional_def_count >= MAX_POSITIONAL)
+		return ARGPARSE_ERR_TOO_MANY_POSITIONALS;
 
-    Positional *def = &parser->positional_defs[parser->positional_def_count++];
-    def->name = name;
-    def->value = value;
-    def->description = description;
-    def->required = required ? 1 : 0;
-    return ARGPARSE_OK;
+	Positional *def = &parser->positional_defs[parser->positional_def_count++];
+	def->name = name;
+	def->value = value;
+	def->description = description;
+	def->required = required ? 1 : 0;
+	return ARGPARSE_OK;
 }
 
 /* ------------------------- Static implementations ------------------------- */
 
 static Option *find_option(
 	ArgParser *parser,
-	const char *flag
-)
+	const char *flag)
 {
 	for (int i = 0; i < parser->option_count; ++i)
 	{
@@ -300,8 +293,7 @@ static Option *find_option(
 
 static ArgParseResult parse_int_safe(
 	const char *s,
-	int *out
-)
+	int *out)
 {
 	char *endptr;
 	long val;
@@ -319,8 +311,7 @@ static ArgParseResult assign_option_value(
 	Option *opt,
 	char *value_from_eq,
 	int argc, char *argv[],
-	int *i
-)
+	int *i)
 {
 	int tmp;
 	const char *src;
@@ -355,21 +346,21 @@ static ArgParseResult assign_option_value(
 
 static ArgParseResult bind_positionals(ArgParser *parser)
 {
-    int defs = parser->positional_def_count;
-    int args = parser->positional_count;
+	int defs = parser->positional_def_count;
+	int args = parser->positional_count;
 
-    /* Check required count */
-    for (int i = 0; i < defs; ++i)
-    {
-        if (parser->positional_defs[i].required && i >= args)
-            return ARGPARSE_ERR_MISSING_VALUE;
-    }
-    /* Bind actual values */
-    for (int i = 0; i < defs && i < args; ++i)
-    {
-        Positional *def = &parser->positional_defs[i];
-        if (def->value)
-            *(def->value) = parser->positional_args[i];
-    }
-    return ARGPARSE_OK;
+	/* Check required count */
+	for (int i = 0; i < defs; ++i)
+	{
+		if (parser->positional_defs[i].required && i >= args)
+			return ARGPARSE_ERR_MISSING_VALUE;
+	}
+	/* Bind actual values */
+	for (int i = 0; i < defs && i < args; ++i)
+	{
+		Positional *def = &parser->positional_defs[i];
+		if (def->value)
+			*(def->value) = parser->positional_args[i];
+	}
+	return ARGPARSE_OK;
 }

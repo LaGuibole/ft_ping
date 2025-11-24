@@ -6,7 +6,7 @@
 /*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 15:12:36 by cpoulain          #+#    #+#             */
-/*   Updated: 2025/11/24 15:51:52 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/24 16:10:58 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,54 +25,54 @@ typedef unsigned char   byte;
 
 typedef enum e_argtype
 {
-    ARGTYPE_FLAG,
-    ARGTYPE_INT,
-    ARGTYPE_STRING
+	ARGTYPE_FLAG,
+	ARGTYPE_INT,
+	ARGTYPE_STRING
 }   ArgType;
 
 typedef struct s_option
 {
-    char        *short_flag;
-    char        *long_flag;
-    ArgType     type;
-    void        *value;
-    char        *description;
+	char        *short_flag;
+	char        *long_flag;
+	ArgType     type;
+	void        *value;
+	char        *description;
 }   Option;
 
 typedef struct s_positional
 {
-    const char  *name;
-    char        **value;
-    const char  *description;
-    int         required;
+	const char  *name;
+	char        **value;
+	const char  *description;
+	int         required;
 }   Positional;
 
 typedef struct s_argparser
 {
-    char        *program_name;
-    
-    Option      options[MAX_OPTIONS];
-    int         option_count;
+	char        *program_name;
+	
+	Option      options[MAX_OPTIONS];
+	int         option_count;
 
-    char        *positional_args[MAX_POSITIONAL];
-    int         positional_count;
+	char        *positional_args[MAX_POSITIONAL];
+	int         positional_count;
 
-    Positional  positional_defs[MAX_POSITIONAL];
-    int         positional_def_count;
+	Positional  positional_defs[MAX_POSITIONAL];
+	int         positional_def_count;
 }   ArgParser;
 
 typedef enum e_argparse_result
 {
-    ARGPARSE_OK = 0,
-    ARGPARSE_ERR_TOO_MANY_OPTIONS,
-    ARGPARSE_ERR_TOO_MANY_POSITIONALS,
-    ARGPARSE_ERR_MISSING_VALUE,
-    ARGPARSE_ERR_INVALID_INT,
-    ARGPARSE_ERR_ALLOC
+	ARGPARSE_OK = 0,
+	ARGPARSE_ERR_TOO_MANY_OPTIONS,
+	ARGPARSE_ERR_TOO_MANY_POSITIONALS,
+	ARGPARSE_ERR_MISSING_VALUE,
+	ARGPARSE_ERR_INVALID_INT,
+	ARGPARSE_ERR_ALLOC
 }   ArgParseResult;
 
 /* Core API */
-void            init_arg_parser(ArgParser *parser);
+void            init_arg_parser(ArgParser *parser, const char *program_name);
 ArgParseResult  add_option(ArgParser *parser, const Option *opt_def);
 ArgParseResult  parse_arguments(ArgParser *parser, int argc, char *argv[]);
 void            print_usage(const ArgParser *parser);
@@ -81,40 +81,40 @@ void            free_arg_parser(ArgParser *parser);
 /* Option builders */
 
 Option          build_option(
-                    const char *short_flag,
-                    const char *long_flag,
-                    ArgType type,
-                    void *value,
-                    const char *description);
+					const char *short_flag,
+					const char *long_flag,
+					ArgType type,
+					void *value,
+					const char *description);
 
 /* Flags: underlying value is a byte (0/1) */
 Option          build_flag_option(
-                    const char *short_flag,
-                    const char *long_flag,
-                    byte *value,
-                    const char *description);
+					const char *short_flag,
+					const char *long_flag,
+					byte *value,
+					const char *description);
 
 /* Integer option: underlying value is an int */
 Option          build_int_option(
-                    const char *short_flag,
-                    const char *long_flag,
-                    int *value,
-                    const char *description);
+					const char *short_flag,
+					const char *long_flag,
+					int *value,
+					const char *description);
 
 /* String option: underlying value is a char* variable (pass &my_char_ptr) */
 Option          build_str_option(
-                    const char *short_flag,
-                    const char *long_flag,
-                    char **value,
-                    const char *description);
+					const char *short_flag,
+					const char *long_flag,
+					char **value,
+					const char *description);
 
 /* Positional argument registration */
 
 ArgParseResult  add_positional(
-                    ArgParser *parser,
-                    const char *name,
-                    char **value,
-                    const char *description,
-                    int required);
+					ArgParser *parser,
+					const char *name,
+					char **value,
+					const char *description,
+					int required);
 
 #endif

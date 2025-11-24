@@ -6,26 +6,12 @@
 /*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 12:43:44 by cpoulain          #+#    #+#             */
-/*   Updated: 2025/11/24 15:48:46 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/24 16:54:45 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "ping.h"
-
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: cpoulain <cpoulain@student.42lehavre.fr>    +#+  +:+       +#+       */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/11/24 15:30:00 by cpoulain          #+#    #+#             */
-/*   Updated: 2025/11/24 15:30:00 by cpoulain         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
-#include "argparser.h"
 
 /* ----------------------------- Error printing ----------------------------- */
 
@@ -35,17 +21,17 @@ static void print_argparse_error(ArgParseResult r)
 		return;
 	fprintf(stderr, "ft_ping: argument parsing error: ");
 	if (r == ARGPARSE_ERR_TOO_MANY_OPTIONS)
-		fprintf(stderr, "too many options\n");
+		fprintf(stderr, "too many options\n\n");
 	else if (r == ARGPARSE_ERR_TOO_MANY_POSITIONALS)
-		fprintf(stderr, "too many positional arguments\n");
+		fprintf(stderr, "too many positional arguments\n\n");
 	else if (r == ARGPARSE_ERR_MISSING_VALUE)
-		fprintf(stderr, "missing value for option or positional\n");
+		fprintf(stderr, "missing value for option or positional\n\n");
 	else if (r == ARGPARSE_ERR_INVALID_INT)
-		fprintf(stderr, "invalid integer value\n");
+		fprintf(stderr, "invalid integer value\n\n");
 	else if (r == ARGPARSE_ERR_ALLOC)
-		fprintf(stderr, "memory allocation failure\n");
+		fprintf(stderr, "memory allocation failure\n\n");
 	else
-		fprintf(stderr, "unknown error\n");
+		fprintf(stderr, "unknown error\n\n");
 }
 
 /* ------------------------------- Main entry ------------------------------- */
@@ -54,15 +40,13 @@ int	main(int argc, char *argv[])
 {
 	ArgParser       parser;
 	ArgParseResult  res;
-    Option          opts[3] = {0};
+    Option          opts[OPTION_COUNT] = {0};
 
 	byte            verbose = 0;
 	byte            help = 0;
 	char            *host = NULL;
 
-	init_arg_parser(&parser);
-
-	/* ---- Declare options ---- */
+	init_arg_parser(&parser, "ft_ping");
 
 	opts[0] = build_flag_option(
 		"-v", "--verbose",
@@ -74,9 +58,8 @@ int	main(int argc, char *argv[])
 		&help,
 		"Display this help and exit"
 	);
-    opts[2] = (Option){0};
 
-    for (int i = 0; opts[i].value; i++)
+    for (int i = 0; i < OPTION_COUNT; i++)
     {
 	    res = add_option(&parser, &opts[i]);
 	    if (res != ARGPARSE_OK)
@@ -91,14 +74,11 @@ int	main(int argc, char *argv[])
 		return(print_argparse_error(res), 1);
 
 	res = parse_arguments(&parser, argc, argv);
-	if (res != ARGPARSE_OK && !help)
-		return (print_argparse_error(res), print_usage(&parser), free_arg_parser(&parser), 1);
-
-	if (help)
-		return (printf("Usage: ft_ping host [-v -?]\n\n"), print_usage(&parser), free_arg_parser(&parser), 0);
-
-	if (!host)
-		return (fprintf(stderr, "ft_ping: missing host operand\n"), fprintf(stderr, "Usage: ft_ping [-v -?] host\n"), free_arg_parser(&parser), 1);
+	if (res != ARGPARSE_OK || help)
+        return (res != ARGPARSE_OK && !help ? print_argparse_error(res) : NULL,
+                print_usage(&parser),
+                free_arg_parser(&parser),
+                res != ARGPARSE_OK && !help);
 
 	if (verbose)
 		printf("ft_ping: verbose mode enabled\n");

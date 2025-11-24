@@ -6,7 +6,7 @@
 /*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 15:12:26 by cpoulain          #+#    #+#             */
-/*   Updated: 2025/11/24 15:25:13 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/24 16:55:02 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,5 +14,7 @@
 # define PING_H
 
 #include "argparser.h"
+
+#define OPTION_COUNT 2
 
 #endif
