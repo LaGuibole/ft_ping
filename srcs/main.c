@@ -6,7 +6,7 @@
 /*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 11:05:33 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/24 15:12:04 by guphilip         ###   ########.fr       */
+/*   Updated: 2025/11/24 15:45:09 by guphilip         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,7 @@ int main(int argc, char **argv)
 
         /* wait ~1 second between sends (simple behavior like ping) */
         for (int i = 0; i < 10 && !g_stop; ++i)
-            sleep(100000); /* 0.1s x 10 = 1s */
+            usleep(100000); /* 0.1s x 10 = 1s */
     }
 
     /* print summary */
