@@ -6,6 +6,7 @@
 /*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 11:21:24 by guphilip          #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2025/11/24 15:17:07 by guphilip         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
@@ -44,3 +45,13 @@ double timeval_diff_ms(struct timeval *start, struct timeval *end);
 
 
 #endif
+=======
+/*   Updated: 2025/11/24 11:21:56 by guphilip         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include <unistd.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+>>>>>>> 2ccd1ee (+ | Init)

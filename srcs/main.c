@@ -3,6 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
+<<<<<<< HEAD
 /*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 12:43:44 by cpoulain          #+#    #+#             */
@@ -42,3 +43,19 @@ int	main(int argc, char *argv[])
 	free_arg_parser(&parser);
 	return (0);
 }
+=======
+/*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/11/24 11:05:33 by guphilip          #+#    #+#             */
+/*   Updated: 2025/11/24 11:47:25 by guphilip         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../includes/linker.h"
+
+int main(void)
+{
+    printf("Hello World");
+    return 0;
+}
+>>>>>>> 2ccd1ee (+ | Init)
