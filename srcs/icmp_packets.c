@@ -6,7 +6,11 @@
 /*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 12:41:19 by guphilip          #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2025/11/25 12:35:19 by cpoulain         ###   ########.fr       */
+=======
+/*   Updated: 2025/11/24 15:52:19 by guphilip         ###   ########.fr       */
+>>>>>>> bf49567 (~ | debut ajout commentaires doxygen + code pour explications)
 /*                                                                            */
 /* ************************************************************************** */
 
