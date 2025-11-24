@@ -35,21 +35,23 @@ re: fclean all
 
 =======
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -g -Iincludes
+CFLAGS = -Wall -Wextra -Werror -g -Iincludes -lm
 NAME = ft_ping
 
 SRCDIR = srcs
 OBJDIR = objs
 INCDIR = includes
 
-SOURCES = main.c parser.c
+SOURCES = main.c parser.c resolve_addr.c socket_icmp.c icmp_packets.c send_packets.c receive.c stats.c utils.c
 SRCS = $(addprefix $(SRCDIR)/, $(SOURCES))
 OBJS = $(addprefix $(OBJDIR)/, $(SOURCES:.c=.o))
 
 all: $(NAME)
 
+LDLIBS = -lm
+
 $(NAME): $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS)
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c | $(OBJDIR)
 	$(CC) $(CFLAGS) -c $< -o $@
