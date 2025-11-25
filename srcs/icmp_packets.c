@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   icmp_packets.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
+/*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 12:41:19 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/25 13:41:09 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/25 15:12:52 by guphilip         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,14 @@ uint16_t checksum(void *buffer, int len)
     return ~sum;
 }
 
+/// @brief Construction d'un paquet ICMP Echo Request (type ICMP_ECHO)
+///         Cette fonction remplit l'en tete ICMP (type, code, id sequence), ecrit un timestamp
+///         au debut du payload pour le calcul du RTT, complete le reste du payload avec un motif un a un
+///         puis calcule et positionne le checksum
+/// @param buffer Pointeur vers le buffer ou ecrire le paquet ICMP (contient au min sizeof(struc icmphdr) + PAYLOAD_SIZE octets.)
+/// @param id ID a placer dans l'en tete ICMP
+/// @param seq Numero de sequence a placer dans l'en tete ICMP
+/// @return La longueur totale en octets du paquet ICMP construit
 int build_icmp_echo(uint8_t *buffer, uint16_t id, uint16_t seq)
 {
     struct icmphdr *icmp_hdr = (struct icmphdr *)buffer;

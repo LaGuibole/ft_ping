@@ -3,17 +3,25 @@
 /*                                                        :::      ::::::::   */
 /*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
+/*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/25 13:33:44 by cpoulain          #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2025/11/25 15:25:50 by cpoulain         ###   ########.fr       */
+=======
+/*   Updated: 2025/11/25 15:28:11 by guphilip         ###   ########.fr       */
+>>>>>>> 8699c4d (+ | Add doxygen comments)
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "linker.h"
 
+/// @brief Fonction d'init de la structure ping
+/// @param ping La structure Pin
 void init_ping(t_ping *ping)
 {
+    if (!ping)
+        return ;
     ping->sockfd = -1;
     ping->parser = (ArgParser){0};
     ping->target = (struct sockaddr_in){0};

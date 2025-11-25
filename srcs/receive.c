@@ -3,15 +3,27 @@
 /*                                                        :::      ::::::::   */
 /*   receive.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
+/*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 13:54:06 by guphilip          #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2025/11/25 15:54:07 by cpoulain         ###   ########.fr       */
+=======
+/*   Updated: 2025/11/25 15:19:55 by guphilip         ###   ########.fr       */
+>>>>>>> 8699c4d (+ | Add doxygen comments)
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "linker.h"
 
+/// @brief Recoit et valide une echo reply ICMP, extrait le temps
+/// @param ping Contexte ping pour acceder a l'ID ICMP et le socket
+/// @param out_rtt Pointeur opt. pour stocker le RTT en ms
+/// @param out_ttl Pointeur opt. pour stocker le TTL extrait depuis l'en tete ICMP
+/// @param out_bytes Pointeur opt. pour stocker le nombre de bytes recus apres l'en tete IP
+/// @param out_from Pointeur opt. pour stocker l'adresse du sender
+/// @return 0 au succes, 1 si le paquet n'est pas encore disponible, -1 sur une erreur systeme, 2 si le 
+///         paquet n'est pas une echo reply, 3 si l'ID ne matche pas
 int receive_packet(t_ping *ping, double *out_rtt, int *out_ttl, int *out_bytes, struct sockaddr_in *out_from)
 {
     uint8_t buffer[RECV_BUF_SIZE];

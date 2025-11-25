@@ -3,15 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   stats.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
+/*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 14:22:10 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/25 13:41:23 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/25 15:30:45 by guphilip         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "linker.h"
 
+/// @brief Fonction d'init des parametres de stats dans la structure ping
+/// @param ping Pointeur vers la structure ping
 void stats_init(t_ping *ping)
 {
     if (!ping)
@@ -24,6 +26,9 @@ void stats_init(t_ping *ping)
     ping->rtt_sum2 = 0.0;
 }
 
+/// @brief Met a jour les stats de reception et de delai apres une reponse ICMP
+/// @param ping Contexte courant ping contenant les mesures
+/// @param rtt RTT mesure en ms
 void stats_update(t_ping *ping, double rtt)
 {
     if (!ping)
@@ -39,6 +44,8 @@ void stats_update(t_ping *ping, double rtt)
     ping->rtt_sum2 += rtt * rtt;
 }
 
+/// @brief Affiche les stats gloables de ping a la fin de l'execution
+/// @param ping Contexte courant contenant les mesures
 void stats_print(const t_ping *ping)
 {
     if (!ping)
