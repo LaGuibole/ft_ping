@@ -6,7 +6,7 @@
 /*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 13:54:06 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/25 15:19:55 by guphilip         ###   ########.fr       */
+/*   Updated: 2025/11/25 18:32:33 by guphilip         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,13 +46,13 @@ int receive_packet(t_ping *ping, double *out_rtt, int *out_ttl, int *out_bytes, 
     gettimeofday(&tv_recv, NULL);
 
     if (nbytes < (ssize_t)sizeof(struct iphdr))
-        return RPL_NOECHO;
+        return RPL_TIMEO;
 
     struct iphdr *ip_hdr = (struct iphdr *)buffer;
     int ip_hlen = ip_hdr->ihl * 4;
 
     if (nbytes < ip_hlen + (int)sizeof(struct icmphdr))
-        return RPL_NOECHO;
+        return RPL_TIMEO;
         
     struct icmphdr *icmp_hdr = (struct icmphdr *)(buffer + ip_hlen);
 
@@ -61,6 +61,15 @@ int receive_packet(t_ping *ping, double *out_rtt, int *out_ttl, int *out_bytes, 
         *out_ttl = ip_hdr->ttl;
     if (out_bytes)
         *out_bytes = (int)(nbytes - ip_hlen);
+
+    if (icmp_hdr->type == ICMP_TIME_EXCEEDED)
+    {
+        ping->data = *ip_hdr;
+        ping->icmp_hdr = (struct icmphdr *)(buffer + ip_hlen);
+        ping->len  = nbytes - ip_hlen - (int)sizeof(struct iphdr);
+        return RPL_NOECHO;
+    }
+        
     if (out_from)
         memcpy(out_from, &from, sizeof(from));
 

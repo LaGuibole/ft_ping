@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
+/*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 12:43:44 by cpoulain          #+#    #+#             */
-/*   Updated: 2025/11/25 15:55:02 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/25 17:52:44 by guphilip         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,6 +112,9 @@ static int executing_loop(t_ping *ping)
 		else if (r == RPL_NOECHO)
 		{
 			print_ttl_exceeded(ping, _bytes);
+			
+			if (ping->args.verbose && ping->len > 0)
+				print_ttl_exceeded_dump(ping);
 		}
 		else
 			break;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_ping.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
+/*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 12:36:58 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/25 15:38:08 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/25 17:45:28 by guphilip         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,9 @@ typedef struct s_ping
     double      rtt_max;
     double      rtt_sum;
     double      rtt_sum2;
+    struct iphdr data;
+    struct icmphdr *icmp_hdr;
+    ssize_t     len;
 }   t_ping;
 
 void    init_ping(t_ping *ping);
