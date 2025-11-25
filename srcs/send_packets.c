@@ -3,15 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   send_packets.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
+/*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 14:48:25 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/25 13:41:17 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/25 15:26:06 by guphilip         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "linker.h"
 
+/// @brief Construit et envoie une echo request ICMP vers la cible configuree
+/// @param ping Contexte courant contenant l'identifiant, socket, l'adresse de la target
+/// @return 0 si succes, sinon -1
 int send_packet(t_ping *ping)
 {
     uint8_t buffer[sizeof(struct icmphdr) + PAYLOAD_SIZE];

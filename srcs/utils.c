@@ -3,15 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
+/*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 14:22:56 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/25 14:12:35 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/25 15:31:26 by guphilip         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "linker.h"
 
+/// @brief Fontion pour exprimer le temps en ms
+/// @param start Debut timer
+/// @param end Fin timer
+/// @return La difference start - end exprime en ms
 double timeval_diff_ms(struct timeval *start, struct timeval *end)
 {
     return (end->tv_sec - start->tv_sec) * 1000 + 
