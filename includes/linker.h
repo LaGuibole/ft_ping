@@ -6,7 +6,7 @@
 /*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 11:21:24 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/25 14:17:07 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/25 15:47:59 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,8 @@ void        stats_init(t_ping *ping);
 void        stats_update(t_ping *ping, double rtt);
 void        stats_print(const t_ping *ping);
 double      timeval_diff_ms(struct timeval *start, struct timeval *end);
-void        print_reply(t_ping *ping, const struct sockaddr_in *from, int bytes, int ttl, double rtt);
-
+void        print_reply(t_ping *ping, int bytes, int ttl, double rtt);
+void        print_ttl_exceeded(t_ping *ping, int bytes);
+int         validate_int_min_max(int value, int min, int max);
 
 #endif

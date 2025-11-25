@@ -6,7 +6,7 @@
 /*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 14:25:23 by cpoulain          #+#    #+#             */
-/*   Updated: 2025/11/25 13:44:46 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/25 16:29:23 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,10 @@ static Option *find_option(
 static ArgParseResult parse_int_safe(
 	const char *s,
 	int *out);
+
+static ArgParseResult parse_double_safe(
+	const char *s,
+	double *out);
 
 static ArgParseResult assign_option_value(
 	Option *opt,
@@ -170,7 +174,9 @@ void print_usage(const ArgParser *parser)
 			else if (opt->short_flag)
 				snprintf(flags_buf, sizeof(flags_buf), "%s", opt->short_flag);
 			else if (opt->long_flag)
-				snprintf(flags_buf, sizeof(flags_buf), "    %s%s", opt->long_flag, opt->type == ARGTYPE_INT ? "=N" : "");
+				snprintf(flags_buf, sizeof(flags_buf), "    %s%s", opt->long_flag, 
+					opt->type == ARGTYPE_INT ? "=N" : 
+					opt->type == ARGTYPE_DOUBLE ? "=F" : "");
 
 			printf("  %-*s", max_flag_len, flags_buf);
 			if (opt->description)
@@ -207,6 +213,8 @@ ArgParseResult print_argparse_error(ArgParser *parser)
 		fprintf(stderr, "missing value for option %s\n\n", parser->last_error_arg ? parser->last_error_arg : "");
 	else if (parser->last_error == ARGPARSE_ERR_INVALID_INT)
 		fprintf(stderr, "invalid integer value %s\n\n", parser->last_error_arg);
+	else if (parser->last_error == ARGPARSE_ERR_INVALID_DOUBLE)
+		fprintf(stderr, "invalid double value %s\n\n", parser->last_error_arg);
 	else if (parser->last_error == ARGPARSE_ERR_ALLOC)
 		fprintf(stderr, "memory allocation failure\n\n");
 	else if (parser->last_error == ARGPARSE_ERR_UNKNOWN_OPTION)
@@ -301,6 +309,15 @@ Option build_str_option(
 	return build_option(short_flag, long_flag, ARGTYPE_STRING, value, description);
 }
 
+Option build_double_option(
+	const char *short_flag,
+	const char *long_flag,
+	double *value,
+	const char *description)
+{
+	return build_option(short_flag, long_flag, ARGTYPE_DOUBLE, value, description);
+}
+
 ArgParseResult add_positional(
 	ArgParser *parser,
 	const char *name,
@@ -352,13 +369,30 @@ static ArgParseResult parse_int_safe(
 	return ARGPARSE_OK;
 }
 
+static ArgParseResult parse_double_safe(
+	const char *s,
+	double *out)
+{
+	char *endptr;
+	double val;
+
+	if (s == NULL || *s == '\0')
+		return ARGPARSE_ERR_INVALID_DOUBLE;
+	val = strtod(s, &endptr);
+	if (*endptr != '\0')
+		return ARGPARSE_ERR_INVALID_DOUBLE;
+	*out = val;
+	return ARGPARSE_OK;
+}
+
 static ArgParseResult assign_option_value(
 	Option *opt,
 	char *value_from_eq,
 	int argc, char *argv[],
 	int *i)
 {
-	int tmp;
+	int tmp_int;
+	double tmp_double;
 	const char *src;
 
 	if (opt->type == ARGTYPE_FLAG)
@@ -377,10 +411,17 @@ static ArgParseResult assign_option_value(
 
 	if (opt->type == ARGTYPE_INT)
 	{
-		ArgParseResult r = parse_int_safe(src, &tmp);
+		ArgParseResult r = parse_int_safe(src, &tmp_int);
 		if (r != ARGPARSE_OK)
 			return r;
-		*(int *)opt->value = tmp;
+		*(int *)opt->value = tmp_int;
+	}
+	else if (opt->type == ARGTYPE_DOUBLE)
+	{
+		ArgParseResult r = parse_double_safe(src, &tmp_double);
+		if (r != ARGPARSE_OK)
+			return r;
+		*(double *)opt->value = tmp_double;
 	}
 	else if (opt->type == ARGTYPE_STRING)
 	{

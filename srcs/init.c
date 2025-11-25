@@ -25,4 +25,6 @@ void init_ping(t_ping *ping)
     ping->args = (t_args){0};
 	ping->id = (uint16_t)getpid() & 0xFFFF;
     ping->seq = -1;
+    ping->args.interval = 1;
+    ping->args.ttl = 0;
 }

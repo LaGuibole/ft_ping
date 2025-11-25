@@ -30,7 +30,7 @@ int resolve_target(const char* target, struct sockaddr_in *out)
     ret = getaddrinfo(target, NULL, &hints, &res);
     if (ret != 0)
     {
-        fprintf(stderr, "ft_ping: cannot resolve %s: %s\n", target, gai_strerror(ret));
+        fprintf(stderr, "ft_ping: unknown host\n");
         return -1;
     }
 

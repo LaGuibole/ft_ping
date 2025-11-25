@@ -27,12 +27,18 @@ int receive_packet(t_ping *ping, double *out_rtt, int *out_ttl, int *out_bytes, 
     socklen_t fromlen = sizeof(from);
     struct timeval tv_recv;
     
+    // Initialize output parameters
+    if (out_rtt) *out_rtt = 0.0;
+    if (out_ttl) *out_ttl = 0;
+    if (out_bytes) *out_bytes = 0;
+    if (out_from) memset(out_from, 0, sizeof(*out_from));
+    
     ssize_t nbytes = recvfrom(ping->sockfd, buffer, sizeof(buffer), 0, (struct sockaddr *)&from, &fromlen);
     
     if (nbytes < 0)
     {
         if (errno == EAGAIN || errno == EWOULDBLOCK)
-            return 1;
+            return RPL_TIMEO;
         perror("recvfrom");
         return -1;
     }
@@ -40,21 +46,29 @@ int receive_packet(t_ping *ping, double *out_rtt, int *out_ttl, int *out_bytes, 
     gettimeofday(&tv_recv, NULL);
 
     if (nbytes < (ssize_t)sizeof(struct iphdr))
-        return -1;
+        return RPL_NOECHO;
 
     struct iphdr *ip_hdr = (struct iphdr *)buffer;
     int ip_hlen = ip_hdr->ihl * 4;
 
     if (nbytes < ip_hlen + (int)sizeof(struct icmphdr))
-        return -1;
+        return RPL_NOECHO;
         
     struct icmphdr *icmp_hdr = (struct icmphdr *)(buffer + ip_hlen);
 
+    // Set common values for any valid IP packet
+    if (out_ttl)
+        *out_ttl = ip_hdr->ttl;
+    if (out_bytes)
+        *out_bytes = (int)(nbytes - ip_hlen);
+    if (out_from)
+        memcpy(out_from, &from, sizeof(from));
+
     if (icmp_hdr->type != ICMP_ECHOREPLY)
-        return 2;
+        return RPL_NOECHO;
 
     if (ntohs(icmp_hdr->un.echo.id) != ping->id)
-        return 3;
+        return RPL_NOECHO;
 
     uint8_t *payload = (uint8_t *)icmp_hdr + sizeof(struct icmphdr);
     struct timeval *tv_sent = (struct timeval *)payload;
@@ -63,11 +77,6 @@ int receive_packet(t_ping *ping, double *out_rtt, int *out_ttl, int *out_bytes, 
     
     if (out_rtt)
         *out_rtt = rtt;
-    if (out_ttl)
-        *out_ttl = ip_hdr->ttl;
-    if (out_bytes)
-        *out_bytes = (int)(nbytes - ip_hlen);
-    if (out_from)
-        memcpy(out_from, &from, sizeof(from));
-    return 0;
+        
+    return RPL_ECHO;
 }
