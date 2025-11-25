@@ -6,13 +6,13 @@
 /*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 14:22:56 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/25 18:22:34 by guphilip         ###   ########.fr       */
+/*   Updated: 2025/11/25 18:44:15 by guphilip         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "linker.h"
 
-// static void print_hex_line(const uint8_t *buffer, ssize_t len);
+static void print_hex_line(const uint8_t *buffer, ssize_t len);
 
 /// @brief Fontion pour exprimer le temps en ms
 /// @param start Debut timer
@@ -65,13 +65,13 @@ void print_ttl_exceeded_dump(t_ping *ping)
     inet_ntop(AF_INET, &a, dest, sizeof(dest));
 
     printf("IP Hdr Dump:\n");
-    // print_hex_line(data, len);
+    print_hex_line((uint8_t*)&ping->data, ping->len > 28 ? 28 : ping->len);
     printf("Vr HL TOS  Len   ID Flg  off TTL Pro  cks      Src\tDst\tData\n");
-    printf(" %u  %u  %02x %04u %04x   %u %04x  %02u  %02u %04x  %s  %s \n",
+    printf(" %u  %u  %02x %04x %04x   %u %04x  %02u  %02u %04x  %s  %s \n",
         ping->data.version,
         ping->data.ihl,
         ping->data.tos,  /* déjà un uint8_t */
-        tot_len,
+        tot_len,         /* CORRECTION: %04x au lieu de %04u */
         id,
         flags,
         offset,
@@ -104,16 +104,14 @@ int validate_int_min_max(int value, int min, int max)
 
 // // static declarations
 
-// static void print_hex_line(const uint8_t *buffer, ssize_t len)
-// {
-//     for (ssize_t i = 0; i < len; ++i)
-//     {
-//         printf("%02x", buffer[i]);
-//         if ((i % 16) == 15)
-//             printf("\n");
-//         else
-//             printf(" ");   
-//     }
-//     if (len % 16)
-//         printf("\n");
-// }
+static void print_hex_line(const uint8_t *buffer, ssize_t len)
+{
+    for (ssize_t i = 0; i < len; ++i)
+    {
+        printf("%02x", buffer[i]);
+        if (i%2)
+            printf(" ");   
+    }
+    if (len % 16)
+        printf("\n");
+}

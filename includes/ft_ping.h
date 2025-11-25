@@ -6,7 +6,7 @@
 /*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 12:36:58 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/25 17:45:28 by guphilip         ###   ########.fr       */
+/*   Updated: 2025/11/25 18:35:00 by guphilip         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ typedef struct s_ping
     double      rtt_sum2;
     struct iphdr data;
     struct icmphdr *icmp_hdr;
+    struct icmphdr *icmp_hdr_copy;
     ssize_t     len;
 }   t_ping;
 

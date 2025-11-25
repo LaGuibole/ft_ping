@@ -6,7 +6,7 @@
 /*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 13:54:06 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/25 18:32:33 by guphilip         ###   ########.fr       */
+/*   Updated: 2025/11/25 18:35:00 by guphilip         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,9 +64,46 @@ int receive_packet(t_ping *ping, double *out_rtt, int *out_ttl, int *out_bytes, 
 
     if (icmp_hdr->type == ICMP_TIME_EXCEEDED)
     {
-        ping->data = *ip_hdr;
-        ping->icmp_hdr = (struct icmphdr *)(buffer + ip_hlen);
-        ping->len  = nbytes - ip_hlen - (int)sizeof(struct iphdr);
+        // L'en-tête IP original est dans le payload ICMP après l'en-tête ICMP
+        uint8_t *inner_ip_ptr = (uint8_t *)icmp_hdr + sizeof(struct icmphdr);
+        struct iphdr *inner_ip = (struct iphdr *)inner_ip_ptr;
+        
+        // Vérifier qu'on a assez de données pour l'inner IP
+        ssize_t inner_available = nbytes - ip_hlen - sizeof(struct icmphdr);
+        if (inner_available < (ssize_t)sizeof(struct iphdr))
+            return RPL_NOECHO;
+        
+        // Vérifier que l'en-tête IP interne est valide
+        if (inner_ip->version != 4 || inner_ip->ihl < 5)
+            return RPL_NOECHO;
+        
+        // Copie l'en-tête IP ORIGINAL (pas celui du routeur)
+        ping->data = *inner_ip;
+        
+        // L'ICMP original est après l'en-tête IP interne
+        int inner_ip_hlen = inner_ip->ihl * 4;
+        
+        // Variable statique pour éviter malloc/free
+        static struct icmphdr icmp_copy;
+        
+        // Copier l'ICMP interne si disponible
+        if (inner_available >= inner_ip_hlen + (ssize_t)sizeof(struct icmphdr))
+        {
+            struct icmphdr *inner_icmp = (struct icmphdr *)(inner_ip_ptr + inner_ip_hlen);
+            
+            if (inner_icmp->type == ICMP_ECHO)
+            {
+                icmp_copy = *inner_icmp;
+                ping->icmp_hdr = &icmp_copy;
+            }
+            else
+                ping->icmp_hdr = NULL;
+        }
+        else
+            ping->icmp_hdr = NULL;
+        
+        ping->len = (int)inner_available;
+        
         return RPL_NOECHO;
     }
         
