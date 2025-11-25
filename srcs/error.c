@@ -6,11 +6,11 @@
 /*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 17:24:28 by cpoulain          #+#    #+#             */
-/*   Updated: 2025/11/24 17:58:55 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/25 12:52:32 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ping.h"
+#include "ft_ping.h"
 
 void   exit_ping(ArgParser *parser, byte help)
 {

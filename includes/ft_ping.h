@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_ping.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 12:36:58 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/24 15:16:13 by guphilip         ###   ########.fr       */
+/*   Updated: 2025/11/25 12:52:34 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,11 @@
 
 # include <stdint.h>
 # include <netinet/in.h>
+# include "argparser.h"
 
 #define PAYLOAD_SIZE 56
 #define RECV_BUF_SIZE 1500
+#define OPTION_COUNT 2
 
 typedef struct s_ping
 {
@@ -33,5 +35,8 @@ typedef struct s_ping
     double rtt_sum;
     double rtt_sum2;
 }   t_ping;
+
+
+void   exit_ping(ArgParser *parser, byte help);
 
 #endif

@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   resolve_addr.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 11:57:08 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/24 12:15:25 by guphilip         ###   ########.fr       */
+/*   Updated: 2025/11/25 12:52:27 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/linker.h"
+#include "linker.h"
 
 int resolve_target(const char* target, struct sockaddr_in *out)
 {
