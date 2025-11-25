@@ -2,7 +2,8 @@
 
 PI : Ce projet a été réalisé à deux pour gagner du temps et se faire plaisir sur un petit projet en C post-tronc commun, pas pour le moins inintéressant.
 
-Parsing : Charles Poulain @CodeWithCharles
+Parsing : Charles Poulain [@CodeWithCharles](https://github.com/CodeWithCharles)
+
 Protocole ICMP : @me
 
 ## Le protocole ICMP
