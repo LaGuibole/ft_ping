@@ -6,7 +6,7 @@
 /*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/25 13:33:44 by cpoulain          #+#    #+#             */
-/*   Updated: 2025/11/25 15:28:11 by guphilip         ###   ########.fr       */
+/*   Updated: 2025/11/25 15:36:47 by guphilip         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,5 +24,5 @@ void init_ping(t_ping *ping)
     ping->resolved_target[0] = '\0';
     ping->args = (t_args){0};
 	ping->id = (uint16_t)getpid() & 0xFFFF;
-    ping->seq = 0;
+    ping->seq = -1;
 }
