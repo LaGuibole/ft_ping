@@ -1,22 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ping.h                                             :+:      :+:    :+:   */
+/*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/11/24 15:12:26 by cpoulain          #+#    #+#             */
-/*   Updated: 2025/11/25 12:25:51 by cpoulain         ###   ########.fr       */
+/*   Created: 2025/11/25 13:33:44 by cpoulain          #+#    #+#             */
+/*   Updated: 2025/11/25 13:58:49 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PING_H
-# define PING_H
+#include "linker.h"
 
-#include "argparser.h"
-
-#define OPTION_COUNT 2
-
-void   exit_ping(ArgParser *parser, byte help);
-
-#endif
+void init_ping(t_ping *ping)
+{
+    ping->sockfd = -1;
+    ping->parser = (ArgParser){0};
+    ping->target = (struct sockaddr_in){0};
+    ping->resolved_target[0] = '\0';
+    ping->args = (t_args){0};
+	ping->id = (uint16_t)getpid() & 0xFFFF;
+    ping->seq = 0;
+}

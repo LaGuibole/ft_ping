@@ -1,14 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parser.c                                           :+:      :+:    :+:   */
+/*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/11/24 11:05:31 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/24 11:46:38 by guphilip         ###   ########.fr       */
+/*   Created: 2025/11/25 14:02:49 by cpoulain          #+#    #+#             */
+/*   Updated: 2025/11/25 14:18:05 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/linker.h"
+#include "linker.h"
 
+void sigint_handler(int sig)
+{
+    (void)sig;
+    g_stop = 1;
+}

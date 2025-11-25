@@ -1,7 +1,4 @@
 en.subject.pdf
-.vscode
+.vscode/
 objs/
-<<<<<<< HEAD
 bin/
-=======
->>>>>>> 2ccd1ee (+ | Init)

@@ -6,17 +6,17 @@
 /*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 17:24:28 by cpoulain          #+#    #+#             */
-/*   Updated: 2025/11/24 17:58:55 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/25 13:41:03 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ping.h"
+#include "linker.h"
 
-void   exit_ping(ArgParser *parser, byte help)
+void   exit_ping(t_ping *ping, byte help)
 {
-    int exit_code = (parser->last_error != ARGPARSE_OK && !help ? parser->last_error : 0);
+    int exit_code = (ping->parser.last_error != ARGPARSE_OK && !help ? ping->parser.last_error : 0);
     
-    exit_code ? print_argparse_error(parser) : print_usage(parser);
-    free_arg_parser(parser);
+    exit_code ? print_argparse_error(&ping->parser) : print_usage(&ping->parser);
+    free_arg_parser(&ping->parser);
     exit(exit_code);
 }

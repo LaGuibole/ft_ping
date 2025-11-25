@@ -3,15 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   receive.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 13:54:06 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/24 15:03:56 by guphilip         ###   ########.fr       */
+/*   Updated: 2025/11/25 13:41:12 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/linker.h"
-#include "../includes/ft_ping.h"
+#include "linker.h"
 
 int receive_packet(t_ping *ping, double *out_rtt, int *out_ttl, int *out_bytes, struct sockaddr_in *out_from)
 {
