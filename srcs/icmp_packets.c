@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   icmp_packets.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
+/*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 12:41:19 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/25 12:52:31 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/25 13:18:37 by guphilip         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,11 +46,11 @@ int build_icmp_echo(uint8_t *buffer, uint16_t id, uint16_t seq)
 {
     struct icmphdr *icmp_hdr = (struct icmphdr *)buffer;
     
-    icmp_hdr->type = ICMP_ECHO;
-    icmp_hdr->code = 0;
-    icmp_hdr->checksum = 0;
-    icmp_hdr->un.echo.id = htons(id);
-    icmp_hdr->un.echo.sequence = htons(seq);
+    icmp_hdr->type = ICMP_ECHO; // type 8 pour les echo request / type 0 pour les echo reply
+    icmp_hdr->code = 0; // code toujours a zero pour les echo
+    icmp_hdr->checksum = 0; // set a zero de base, complement un a un sur msg 16 bit (big endian demarre avec octet de poids fort)
+    icmp_hdr->un.echo.id = htons(id); // utilise pour faire correspondre les requests et responses
+    icmp_hdr->un.echo.sequence = htons(seq); // incremente a chaque echo request
     
     // payload, on fout le timestamp au debut du payload pour les calculs de RTT
     struct timeval now;
