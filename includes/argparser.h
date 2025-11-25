@@ -6,7 +6,7 @@
 /*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 15:12:36 by cpoulain          #+#    #+#             */
-/*   Updated: 2025/11/25 12:52:36 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/25 15:36:18 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ typedef enum e_argtype
 {
 	ARGTYPE_FLAG,
 	ARGTYPE_INT,
+	ARGTYPE_DOUBLE,
 	ARGTYPE_STRING
 }   ArgType;
 
@@ -55,6 +56,7 @@ typedef enum e_argparse_result
 	ARGPARSE_ERR_TOO_MANY_POSITIONALS,
 	ARGPARSE_ERR_MISSING_VALUE,
 	ARGPARSE_ERR_INVALID_INT,
+	ARGPARSE_ERR_INVALID_DOUBLE,
 	ARGPARSE_ERR_ALLOC,
 	ARGPARSE_ERR_UNKNOWN_OPTION
 }   ArgParseResult;
@@ -113,6 +115,13 @@ Option          build_str_option(
 					const char *short_flag,
 					const char *long_flag,
 					char **value,
+					const char *description);
+
+/* Double option: underlying value is a double */
+Option          build_double_option(
+					const char *short_flag,
+					const char *long_flag,
+					double *value,
 					const char *description);
 
 /* Positional argument registration */

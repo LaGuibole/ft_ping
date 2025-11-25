@@ -6,7 +6,7 @@
 /*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/25 13:33:44 by cpoulain          #+#    #+#             */
-/*   Updated: 2025/11/25 13:58:49 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/25 15:25:50 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,4 +21,6 @@ void init_ping(t_ping *ping)
     ping->args = (t_args){0};
 	ping->id = (uint16_t)getpid() & 0xFFFF;
     ping->seq = 0;
+    ping->args.interval = 1;
+    ping->args.ttl = 0;
 }

@@ -6,7 +6,7 @@
 /*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 14:22:56 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/25 14:12:35 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/25 15:50:30 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,15 +18,26 @@ double timeval_diff_ms(struct timeval *start, struct timeval *end)
             (end->tv_usec - start->tv_usec) / 1000;
 }
 
-void print_reply(t_ping *ping, const struct sockaddr_in *from, int bytes, int ttl, double rtt)
+void print_reply(t_ping *ping, int bytes, int ttl, double rtt)
 {
-    char from_ip[INET_ADDRSTRLEN];
-    inet_ntop(AF_INET, &from->sin_addr, from_ip, sizeof(from_ip));
-
     printf("%d bytes from %s: icmp_seq=%u ttl=%d time=%.3f ms\n",
            bytes,
-           from_ip,
+           ping->resolved_target,
            ping->seq,
            ttl,
            rtt);
+}
+
+void print_ttl_exceeded(t_ping *ping, int bytes)
+{
+    printf("%d bytes from %s: Time to live exceeded\n",
+           bytes,
+           ping->resolved_target);
+}
+
+int validate_int_min_max(int value, int min, int max)
+{
+    if (value < min || value > max)
+        return (printf("ft_ping: option value too big: %d\n", value), 1);
+    return 0;
 }

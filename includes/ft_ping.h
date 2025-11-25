@@ -6,7 +6,7 @@
 /*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 12:36:58 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/25 14:11:42 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/25 15:38:08 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 
 #define PAYLOAD_SIZE 56
 #define RECV_BUF_SIZE 1500
-#define OPTION_COUNT 2
+#define OPTION_COUNT 5
 
 #define RPL_ECHO 0
 #define RPL_TIMEO 1
@@ -30,6 +30,9 @@ typedef struct s_args
     char        *target_str;
     byte        verbose;
     byte        help;
+    byte        quiet;
+    double      interval;
+    int         ttl;
 }   t_args;
 
 typedef struct s_ping
