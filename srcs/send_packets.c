@@ -6,11 +6,10 @@
 /*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 14:48:25 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/25 12:52:37 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/25 13:41:17 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_ping.h"
 #include "linker.h"
 
 int send_packet(t_ping *ping)
