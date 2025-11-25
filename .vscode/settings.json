@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "ping.h": "c"
+        "ping.h": "c",
+        "argparser.h": "c"
     }
 }

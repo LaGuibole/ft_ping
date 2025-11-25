@@ -6,7 +6,7 @@
 /*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 12:43:44 by cpoulain          #+#    #+#             */
-/*   Updated: 2025/11/24 18:04:24 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/25 12:14:29 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,9 @@ int	main(int argc, char *argv[])
         || add_positional(&parser, "host", &host, "IPv4 address or hostname", 1)
         || parse_arguments(&parser, argc, argv))
             exit_ping(&parser, help);
+
+	if (help)
+		exit_ping(&parser, help);
 
 	if (verbose)
 		printf("ft_ping: verbose mode enabled\n");
