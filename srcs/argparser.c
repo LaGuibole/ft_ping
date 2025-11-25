@@ -6,7 +6,7 @@
 /*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 14:25:23 by cpoulain          #+#    #+#             */
-/*   Updated: 2025/11/25 12:52:33 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/25 13:44:46 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -240,6 +240,8 @@ void free_arg_parser(ArgParser *parser)
 		free(opt->short_flag);
 		free(opt->long_flag);
 		free(opt->description);
+		if (opt->type == ARGTYPE_STRING)
+			free(opt->value);
 		opt->short_flag = NULL;
 		opt->long_flag = NULL;
 		opt->description = NULL;
@@ -263,11 +265,11 @@ Option build_option(
 	Option res = {0};
 
 
-	res.short_flag = short_flag != NULL ? strdup(short_flag) : NULL;
-	res.long_flag = long_flag != NULL ? strdup(long_flag) : NULL;
+	res.short_flag = (char *)short_flag;
+	res.long_flag = (char *)long_flag;
 	res.type = type;
 	res.value = value;
-	res.description = description != NULL ? strdup(description) : NULL;
+	res.description = (char *)description;
 
 	return res;
 }

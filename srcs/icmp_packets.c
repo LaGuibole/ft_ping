@@ -6,12 +6,11 @@
 /*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 12:41:19 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/25 12:52:31 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/25 13:41:09 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "linker.h"
-#include "ft_ping.h"
 
 /// @brief Calcule le checksum 16 bits sur une zone memoire. Implementation classique ICMP (InternetChecksum)
 /// @param buffer Pointeur vers la zone memoire a sum (void *) pour de la flexinilite. La memoire est interpretee comme une sequence d'octets
