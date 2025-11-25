@@ -3,14 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   receive.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 13:54:06 by guphilip          #+#    #+#             */
-<<<<<<< HEAD
-/*   Updated: 2025/11/25 15:54:07 by cpoulain         ###   ########.fr       */
-=======
-/*   Updated: 2025/11/25 15:19:55 by guphilip         ###   ########.fr       */
->>>>>>> 8699c4d (+ | Add doxygen comments)
+/*   Updated: 2025/11/25 16:29:32 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 

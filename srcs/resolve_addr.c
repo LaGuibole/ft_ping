@@ -3,14 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   resolve_addr.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 11:57:08 by guphilip          #+#    #+#             */
-<<<<<<< HEAD
-/*   Updated: 2025/11/25 15:07:03 by cpoulain         ###   ########.fr       */
-=======
-/*   Updated: 2025/11/25 15:24:34 by guphilip         ###   ########.fr       */
->>>>>>> 8699c4d (+ | Add doxygen comments)
+/*   Updated: 2025/11/25 16:29:40 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
