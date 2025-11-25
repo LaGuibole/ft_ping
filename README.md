@@ -17,7 +17,8 @@ ICMP sert à fournir des retours d’information sur les problèmes dans un envi
 
 ## Ping et les messages echo
 
-### Structure d'un message Echo Request / Reply 
+### Structure d'un message Echo Request / Reply
+``` 
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -27,7 +28,7 @@ ICMP sert à fournir des retours d’information sur les problèmes dans un envi
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                           DATA...                             |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-
+```
 #### 1 - Type(8 bits / 1 octet):
  - Echo Request: Type = 8
  - Echo Reply: Type = 0
@@ -146,6 +147,7 @@ ICMP is used to provide feedback on problems in a communication environment, for
 ## Ping and echo messages
 
 ### Structure of an Echo Request / Reply message
+```
  0                   1                   2                   3
  0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -155,6 +157,7 @@ ICMP is used to provide feedback on problems in a communication environment, for
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 |                           DATA...                             |
 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+```
 
 #### 1 - Type (8 bits / 1 byte):
  - Echo Request: Type = 8
