@@ -16,6 +16,7 @@ OBJ_DIR			:= objs
 INCLUDES		:= -I./$(LIB_DIR)
 CC				:= gcc
 CFLAGS			:= -Wall -Wextra -Werror -g $(INCLUDES)
+LFLAGS			:= -lm
 
 # ----------------------------------- Files ---------------------------------- #
 

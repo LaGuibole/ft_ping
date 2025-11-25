@@ -8,7 +8,7 @@ include Vars.mk
 
 $(NAME): $(OBJS)
 	@mkdir -p $(@D)
-	@$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
+	@$(CC) $(CFLAGS) $(OBJS) -o $(NAME) $(LFLAGS)
 	@echo "[$(TARGET_NAME)] Compiled successfully!"
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
