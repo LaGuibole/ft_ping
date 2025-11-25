@@ -100,31 +100,31 @@ uint16_t checksum(void *buffer, int len)
 
 #### Socket RAW:
 
-On doit utiliser un socket RAW avec ==IPPROTO_ICMP==. => Privilèges root/admin obligatoire. 
+On doit utiliser un socket RAW avec `IPPROTO_ICMP`. => Privilèges root/admin obligatoire. 
 
 #### Ordonnancement de byte:
 
-Les champs multi-octets sont en **network byte order** (big endian). Utiliser ==htons()==, ==htonl()== et [compagnie](https://linux.die.net/man/3/htons)
+Les champs multi-octets sont en **network byte order** (big endian). Utiliser `htons()`, `htonl()` et [compagnie](https://linux.die.net/man/3/htons)
 
 #### Pour l’identifier et la Sequence: 
 
-Implémenter un timeout sans utiliser ==select()== ou ==poll()== pour détecter les paquets perdus.
+Implémenter un timeout sans utiliser `select()` ou `poll()` pour détecter les paquets perdus.
 
 ## Comportement du programme: 
 
 1. Parse des arguments
-2. Résolution de l’hôte -> ==resolve_target()==
-3. Ouverture du socket RAW ICMP -> ==open_icmp_socket()==
-4. Init des stats -> ==stats_init()==
+2. Résolution de l’hôte -> `resolve_target()`
+3. Ouverture du socket RAW ICMP -> `open_icmp_socket()`
+4. Init des stats -> `stats_init()`
 5. Boucle principale (envoyer, recevoir, mettre à jour, afficher)
-  -> Construction du paquet ICMP -> ==build_icmp_echo()==
-    Calcul le checksum ==checksum()==
+  -> Construction du paquet ICMP -> `build_icmp_echo()`
+    Calcul le checksum `checksum()`
     Horodatage dans le payload
-  -> Envoyer ==send_packet()==
-  -> Attendre réception ==receive_packet()==
+  -> Envoyer `send_packet()`
+  -> Attendre réception `receive_packet()`
     Parse l’en-tête IP, calcul de l’ip_hlen, récupération du ICMP
     Set du retour (1,2,3)
-    Récupération du timediff ==timeval_diff_ms()==
+    Récupération du timediff `timeval_diff_ms()`
 6. Print des stats.
 
 # ft_ping 🇬🇧
@@ -231,29 +231,29 @@ return ~sum;
 
 #### RAW Socket:
 
-A RAW socket with ==IPPROTO_ICMP== must be used. => root/admin privileges required.
+A RAW socket with `IPPROTO_ICMP` must be used. => root/admin privileges required.
 
 #### Byte order:
 
-Multi-byte fields are in **network byte order** (big endian). Use ==htons()==, ==htonl()== and friends.
+Multi-byte fields are in **network byte order** (big endian). Use `htons()`, `htonl()` and friends.
 
 #### For the identifier and the sequence:
 
-Implement a timeout without using ==select()== or ==poll()== to detect lost packets.
+Implement a timeout without using `select()` or `poll()` to detect lost packets.
 
 ## Program behavior:
 
 1. Parse arguments
-2. Resolve host -> ==resolve_target()==
-3. Open RAW ICMP socket -> ==open_icmp_socket()==
-4. Init stats -> ==stats_init()==
+2. Resolve host -> `resolve_target()`
+3. Open RAW ICMP socket -> `open_icmp_socket()`
+4. Init stats -> `stats_init()`
 5. Main loop (send, receive, update, display)
-  -> Build ICMP packet -> ==build_icmp_echo()==
-    Compute checksum ==checksum()==
+  -> Build ICMP packet -> `build_icmp_echo()`
+    Compute checksum `checksum()`
     Timestamp inside payload
-  -> Send ==send_packet()==
-  -> Wait for reception ==receive_packet()==
+  -> Send `send_packet()`
+  -> Wait for reception `receive_packet()`
     Parse IP header, compute ip_hlen, extract ICMP
     Set return code (1,2,3)
-    Compute timediff ==timeval_diff_ms()==
+    Compute timediff `timeval_diff_ms()`
 6. Print stats.
