@@ -3,15 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   resolve_addr.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
+/*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 11:57:08 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/25 12:52:27 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/25 15:24:34 by guphilip         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "linker.h"
 
+/// @brief Resout une cible (IPv4) et remplit la structure fournie (addrinfo hints)
+/// @param target Nom d'hote ou adresse a resoudre
+/// @param out Pointeur vers une structure socckaddr_in a remplir avec l'adresse resolue
+/// @return 0 si succes, sinon -1
 int resolve_target(const char* target, struct sockaddr_in *out)
 {
     struct addrinfo hints;
@@ -26,7 +30,7 @@ int resolve_target(const char* target, struct sockaddr_in *out)
     ret = getaddrinfo(target, NULL, &hints, &res);
     if (ret != 0)
     {
-        fprintf(stderr, "ft_ping: cannot resolve %s: %s\n", target, gai_strerror(ret));
+        fprintf(stderr, "ft_ping: unknown host\n");
         return -1;
     }
 
