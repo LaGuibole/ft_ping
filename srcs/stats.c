@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   stats.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 14:22:10 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/25 15:30:45 by guphilip         ###   ########.fr       */
+/*   Updated: 2025/11/25 17:01:14 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ void stats_print(const t_ping *ping)
     if (tx > 0)
         loss = ((double)(tx - rx) / (double)tx) * 100;
     
-    printf("\n--- %s ping statistics ---\n", ping->args.target_str);
+    printf("--- %s ping statistics ---\n", ping->args.target_str);
     printf("%d packets transmitted, %d packets received, %.0f%% packet loss\n", tx, rx, loss);
 
     if (rx > 0)

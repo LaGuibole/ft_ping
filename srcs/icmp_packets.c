@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   icmp_packets.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 12:41:19 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/25 15:12:52 by guphilip         ###   ########.fr       */
+/*   Updated: 2025/11/25 16:56:45 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ uint16_t checksum(void *buffer, int len)
 /// @param id ID a placer dans l'en tete ICMP
 /// @param seq Numero de sequence a placer dans l'en tete ICMP
 /// @return La longueur totale en octets du paquet ICMP construit
-int build_icmp_echo(uint8_t *buffer, uint16_t id, uint16_t seq)
+int build_icmp_echo(t_ping *ping, uint8_t *buffer, uint16_t id, uint16_t seq)
 {
     struct icmphdr *icmp_hdr = (struct icmphdr *)buffer;
     
@@ -65,7 +65,7 @@ int build_icmp_echo(uint8_t *buffer, uint16_t id, uint16_t seq)
     uint8_t *payload = buffer + sizeof(struct icmphdr);
     memcpy(payload, &now, sizeof(now));
 
-    int payload_len = PAYLOAD_SIZE;
+    int payload_len = ping->args.packet_size;
     for (int i = sizeof(now); i < payload_len; ++i)
         payload[i] = (uint8_t)(i & 0xFF);
     

@@ -6,7 +6,7 @@
 /*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 11:21:24 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/25 15:47:59 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/25 16:59:11 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@
 extern volatile sig_atomic_t g_stop;
 
 uint16_t    checksum(void *buffer, int len);
-int         build_icmp_echo(uint8_t *buffer, uint16_t id, uint16_t seq);
+int         build_icmp_echo(t_ping *ping, uint8_t *buffer, uint16_t id, uint16_t seq);
 int         receive_packet(t_ping *ping, double *out_rtt, int *out_ttl, int *out_bytes, struct sockaddr_in *out_from);
 int         resolve_target(const char* target, struct sockaddr_in *out);
 int         send_packet(t_ping *ping);
