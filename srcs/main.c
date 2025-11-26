@@ -6,7 +6,7 @@
 /*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 12:43:44 by cpoulain          #+#    #+#             */
-/*   Updated: 2025/11/25 15:55:02 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/26 11:44:49 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,20 +30,21 @@ int main(int argc, char *argv[])
 
 	init_ping(&ping);
 	init_arg_parser(parser, "ft_ping");
-	opts[0] = build_flag_option("-v", "--verbose", &args->verbose, "Verbose output (show packet/error details)");
-	opts[1] = build_flag_option("-?", "--help", &args->help, "Display this help and exit");
-	opts[2] = build_flag_option("-q", "--quiet", &args->quiet, "quiet output");
-	opts[3] = build_double_option("-i", "--interval", &args->interval, "Wait INTERVAL seconds between sending each packet (default: 1s)");
-	opts[4] = build_int_option(NULL, "--ttl", &args->ttl, "Set the IP Time to Live (default: 0 for auto)");
+	opts[0] = build_flag_option("-v", "--verbose", &args->verbose, VERBOSE_DESC);
+	opts[1] = build_flag_option("-?", "--help", &args->help, HELP_DESC);
+	opts[2] = build_flag_option("-q", "--quiet", &args->quiet, QUIET_DESC);
+	opts[3] = build_double_option("-i", "--interval", &args->interval, INTERVAL_DESC);
+	opts[4] = build_int_option(NULL, "--ttl", &args->ttl, TTL_DESC);
+	opts[5] = build_int_option("-c", "--count", &args->packet_count, COUNT_DESC);
+	opts[6] = build_int_option("-s", "--size", &args->packet_size, SIZE_DESC);
 	if (add_options(parser, opts, OPTION_COUNT) || add_positional(parser, "host", &args->target_str, "IPv4 address or hostname", 1) || parse_arguments(parser, argc, argv))
 		exit_ping(&ping, args->help);
 
 	if (args->help)
 		exit_ping(&ping, args->help);
 
-	if (validate_int_min_max(args->ttl, 0, 255))
+	if (validate_int_min_max(args->ttl, 0, 255), validate_int_min_max(args->packet_size, 0, 65400))
 		return (free_arg_parser(parser), 1);
-
 
 	if (executing(&ping))
 		return (free_arg_parser(parser), 1);
@@ -71,14 +72,14 @@ static int executing(t_ping *ping)
 
 	setsockopt(ping->sockfd, SOL_SOCKET, SO_RCVTIMEO, &(struct timeval){2, 0}, sizeof(struct timeval));
 	if (ping->args.ttl > 0)
-		if(setsockopt(ping->sockfd, IPPROTO_IP, IP_TTL, &ping->args.ttl, sizeof(ping->args.ttl)) < 0 && (!ping->args.quiet))
+		if (setsockopt(ping->sockfd, IPPROTO_IP, IP_TTL, &ping->args.ttl, sizeof(ping->args.ttl)) < 0 && (!ping->args.quiet))
 			perror("ft_ping: warning - failed to set TTL");
 	stats_init(ping);
 	snprintf(buffer, sizeof(buffer), ", id 0x%04x = %d", ping->id, ping->id);
 	printf("PING %s (%s): %d data bytes%s\n",
 		   ping->args.target_str,
 		   ping->resolved_target,
-		   PAYLOAD_SIZE,
+		   ping->args.packet_size,
 		   ping->args.verbose ? buffer : "");
 
 	return (executing_loop(ping));
@@ -86,7 +87,7 @@ static int executing(t_ping *ping)
 
 static int executing_loop(t_ping *ping)
 {
-	while (!g_stop)
+	while (!g_stop && (ping->args.packet_count == 0 || ping->transmitted < ping->args.packet_count))
 	{
 		if (send_packet(ping) < 0)
 		{
@@ -94,10 +95,37 @@ static int executing_loop(t_ping *ping)
 			break;
 		}
 
-		double rtt;
-		int ttl, _bytes;
+		// receive loop avec timeout de 1s
+		double rtt = 0.0;
+		int ttl = 0, _bytes = 0;
 		struct sockaddr_in from;
-		int r = receive_packet(ping, &rtt, &ttl, &_bytes, &from);
+		int r = RPL_TIMEO;
+		
+		struct timeval timeout_start;
+		gettimeofday(&timeout_start, NULL);
+		
+		while (!g_stop)
+		{
+			r = receive_packet(ping, &rtt, &ttl, &_bytes, &from);
+			
+			if (r == RPL_ECHO || r == RPL_TTL_EXCEEDED)
+				break; // reponse recue pour notre paquet
+				
+			if (r != RPL_TIMEO && r != RPL_NOECHO)
+				break; // error
+				
+			// verif timeout
+			struct timeval now;
+			gettimeofday(&now, NULL);
+			double elapsed = timeval_diff_ms(&timeout_start, &now);
+			if (elapsed > 1000.0) // 1s
+			{
+				r = RPL_TIMEO;
+				break;
+			}
+			
+			usleep(1000); // sleep pour eviter le flood
+		}
 
 		if (r == RPL_ECHO)
 		{
@@ -105,17 +133,27 @@ static int executing_loop(t_ping *ping)
 			if (!ping->args.quiet)
 				print_reply(ping, _bytes, ttl, rtt);
 		}
+		else if (r == RPL_TTL_EXCEEDED)
+		{
+            inet_ntop(AF_INET, &from.sin_addr, ping->replier_ip, sizeof(ping->replier_ip));
+			print_ttl_exceeded(ping, _bytes);
+			if (ping->args.verbose && ping->len > 0)
+				print_ttl_exceeded_dump(ping);
+			memset(ping->replier_ip, 0, sizeof(ping->replier_ip));
+			memset(&ping->icmp_hdr_copy, 0, sizeof(struct icmphdr));
+		}
 		else if (r == RPL_TIMEO)
 		{
-			(void)r;
-		}
-		else if (r == RPL_NOECHO)
-		{
-			print_ttl_exceeded(ping, _bytes);
+			//DEBUG
+			// timeout - pas de reponse
+			// if (!ping->args.quiet)
+			// 	printf("Request timeout for icmp_seq %u\n", ping->seq);
 		}
 		else
 			break;
 
+		if (ping->transmitted == ping->args.packet_count)
+			break;
 		usleep(ping->args.interval * 1e6);
 	}
 	stats_print(ping);

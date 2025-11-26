@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   icmp_packets.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 12:41:19 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/25 15:12:52 by guphilip         ###   ########.fr       */
+/*   Updated: 2025/11/25 16:56:45 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ uint16_t checksum(void *buffer, int len)
 /// @param id ID a placer dans l'en tete ICMP
 /// @param seq Numero de sequence a placer dans l'en tete ICMP
 /// @return La longueur totale en octets du paquet ICMP construit
-int build_icmp_echo(uint8_t *buffer, uint16_t id, uint16_t seq)
+int build_icmp_echo(t_ping *ping, uint8_t *buffer, uint16_t id, uint16_t seq)
 {
     struct icmphdr *icmp_hdr = (struct icmphdr *)buffer;
     
@@ -59,15 +59,26 @@ int build_icmp_echo(uint8_t *buffer, uint16_t id, uint16_t seq)
     icmp_hdr->un.echo.id = htons(id);
     icmp_hdr->un.echo.sequence = htons(seq);
     
-    // payload, on fout le timestamp au debut du payload pour les calculs de RTT
-    struct timeval now;
-    gettimeofday(&now, NULL);
     uint8_t *payload = buffer + sizeof(struct icmphdr);
-    memcpy(payload, &now, sizeof(now));
-
-    int payload_len = PAYLOAD_SIZE;
-    for (int i = sizeof(now); i < payload_len; ++i)
-        payload[i] = (uint8_t)(i & 0xFF);
+    int payload_len = ping->args.packet_size;
+    
+    // Seulement ajouter timestamp si assez de place (>=16 bytes comme inetutils)
+    if (payload_len >= (int)sizeof(struct timeval))
+    {
+        struct timeval now;
+        gettimeofday(&now, NULL);
+        memcpy(payload, &now, sizeof(now));
+        
+        // Remplir le reste avec un pattern
+        for (int i = sizeof(now); i < payload_len; ++i)
+            payload[i] = (uint8_t)(i & 0xFF);
+    }
+    else
+    {
+        // Pas assez de place pour le timestamp, juste un pattern
+        for (int i = 0; i < payload_len; ++i)
+            payload[i] = (uint8_t)(i & 0xFF);
+    }
     
     int total_len = sizeof(struct icmphdr) + payload_len;
     icmp_hdr->checksum = checksum((void *)icmp_hdr, total_len);

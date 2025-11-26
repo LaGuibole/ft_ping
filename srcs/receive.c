@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   receive.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 13:54:06 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/25 15:19:55 by guphilip         ###   ########.fr       */
+/*   Updated: 2025/11/26 11:44:29 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ int receive_packet(t_ping *ping, double *out_rtt, int *out_ttl, int *out_bytes, 
     struct timeval tv_recv;
     
     // Initialize output parameters
-    if (out_rtt) *out_rtt = 0.0;
+    if (out_rtt) *out_rtt = -1.0; // -1 = pas de timing disponible
     if (out_ttl) *out_ttl = 0;
     if (out_bytes) *out_bytes = 0;
     if (out_from) memset(out_from, 0, sizeof(*out_from));
@@ -46,37 +46,94 @@ int receive_packet(t_ping *ping, double *out_rtt, int *out_ttl, int *out_bytes, 
     gettimeofday(&tv_recv, NULL);
 
     if (nbytes < (ssize_t)sizeof(struct iphdr))
-        return RPL_NOECHO;
+        return RPL_TIMEO;
 
     struct iphdr *ip_hdr = (struct iphdr *)buffer;
     int ip_hlen = ip_hdr->ihl * 4;
 
     if (nbytes < ip_hlen + (int)sizeof(struct icmphdr))
-        return RPL_NOECHO;
+        return RPL_TIMEO;
         
     struct icmphdr *icmp_hdr = (struct icmphdr *)(buffer + ip_hlen);
-
-    // Set common values for any valid IP packet
+    // set les valeurs pour les paquets avec IP valide
     if (out_ttl)
         *out_ttl = ip_hdr->ttl;
     if (out_bytes)
         *out_bytes = (int)(nbytes - ip_hlen);
+
+    if (icmp_hdr->type == ICMP_TIME_EXCEEDED)
+    {
+        // en tte IP originale dans payload ICMP, apres header ICMP
+        uint8_t *inner_ip_ptr = (uint8_t *)icmp_hdr + sizeof(struct icmphdr);
+        struct iphdr *inner_ip = (struct iphdr *)inner_ip_ptr;    
+        // verif des donnees dispo
+        ssize_t inner_available = nbytes - ip_hlen - sizeof(struct icmphdr);
+        if (inner_available < (ssize_t)sizeof(struct iphdr))
+            return RPL_NOECHO;     
+        // verif validite inner_ip
+        if (inner_ip->version != 4 || inner_ip->ihl < 5 || inner_ip->protocol != IPPROTO_ICMP)
+            return RPL_NOECHO;
+
+        int inner_ip_hlen = inner_ip->ihl * 4;      
+        // verif donnes ICMP interne
+        if (inner_available < inner_ip_hlen + (ssize_t)sizeof(struct icmphdr))
+            return RPL_NOECHO;
+            
+        struct icmphdr *inner_icmp = (struct icmphdr *)(inner_ip_ptr + inner_ip_hlen);   
+        // ECHO REQUEST + notre ping ? 
+        if (inner_icmp->type != ICMP_ECHO || ntohs(inner_icmp->un.echo.id) != ping->id)
+        {
+            // dans le cas d'un mauvais paquet
+            return RPL_NOECHO;
+        }   
+        // paquet actuel ?
+        if (ntohs(inner_icmp->un.echo.sequence) != ping->seq)
+        {
+            // = ancien paquet
+            return RPL_NOECHO;
+        }
+        // notre paquet, on copie pour le dump ttl
+        ping->data = *inner_ip;
+        ping->icmp_hdr_copy = *inner_icmp;
+        ping->len = (int)inner_available;
+        
+        // calcul RTT
+        ssize_t payload_available = inner_available - inner_ip_hlen - sizeof(struct icmphdr);
+        if (payload_available >= (ssize_t)sizeof(struct timeval))
+        {
+            uint8_t *inner_payload = inner_ip_ptr + inner_ip_hlen + sizeof(struct icmphdr);
+            struct timeval *tv_sent = (struct timeval *)inner_payload;
+            double rtt = timeval_diff_ms(tv_sent, &tv_recv);
+            
+            if (out_rtt)
+                *out_rtt = rtt;
+        }
+        
+        if (out_from)
+            memcpy(out_from, &from, sizeof(from));
+        return RPL_TTL_EXCEEDED;
+    }
     if (out_from)
         memcpy(out_from, &from, sizeof(from));
-
     if (icmp_hdr->type != ICMP_ECHOREPLY)
         return RPL_NOECHO;
-
     if (ntohs(icmp_hdr->un.echo.id) != ping->id)
+        return RPL_NOECHO;       
+    // reponse au paquet courant ? 
+    if (ntohs(icmp_hdr->un.echo.sequence) != ping->seq)
         return RPL_NOECHO;
-
-    uint8_t *payload = (uint8_t *)icmp_hdr + sizeof(struct icmphdr);
-    struct timeval *tv_sent = (struct timeval *)payload;
-
-    double rtt = timeval_diff_ms(tv_sent, &tv_recv);
-    
-    if (out_rtt)
-        *out_rtt = rtt;
+        
+    // Calculer RTT seulement si assez de place pour le timestamp
+    int payload_len = nbytes - ip_hlen - sizeof(struct icmphdr);
+    if (payload_len >= (int)sizeof(struct timeval))
+    {
+        uint8_t *payload = (uint8_t *)icmp_hdr + sizeof(struct icmphdr);
+        struct timeval *tv_sent = (struct timeval *)payload;
+        double rtt = timeval_diff_ms(tv_sent, &tv_recv);   
+        if (out_rtt)
+            *out_rtt = rtt;
+    }
+    // sinon out_rtt reste à -1
         
     return RPL_ECHO;
 }

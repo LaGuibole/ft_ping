@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   stats.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 14:22:10 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/25 15:30:45 by guphilip         ###   ########.fr       */
+/*   Updated: 2025/11/25 16:39:54 by guphilip         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,13 +35,17 @@ void stats_update(t_ping *ping, double rtt)
         return ;
     ping->received += 1;
     
-    if (rtt < ping->rtt_min)
-        ping->rtt_min = rtt;
-    if (rtt > ping->rtt_max)
-        ping->rtt_max = rtt;
-    
-    ping->rtt_sum += rtt;
-    ping->rtt_sum2 += rtt * rtt;
+    // Seulement mettre à jour les stats RTT si le timing est disponible
+    if (rtt >= 0.0)
+    {
+        if (rtt < ping->rtt_min)
+            ping->rtt_min = rtt;
+        if (rtt > ping->rtt_max)
+            ping->rtt_max = rtt;
+        
+        ping->rtt_sum += rtt;
+        ping->rtt_sum2 += rtt * rtt;
+    }
 }
 
 /// @brief Affiche les stats gloables de ping a la fin de l'execution
@@ -57,10 +61,11 @@ void stats_print(const t_ping *ping)
     if (tx > 0)
         loss = ((double)(tx - rx) / (double)tx) * 100;
     
-    printf("\n--- %s ping statistics ---\n", ping->args.target_str);
+    printf("--- %s ping statistics ---\n", ping->args.target_str);
     printf("%d packets transmitted, %d packets received, %.0f%% packet loss\n", tx, rx, loss);
 
-    if (rx > 0)
+    // Seulement afficher les stats RTT si on a des mesures valides
+    if (rx > 0 && ping->rtt_sum > 0.0)
     {
         double avg = ping->rtt_sum / rx;
 
@@ -70,6 +75,6 @@ void stats_print(const t_ping *ping)
         
         double mdev = sqrt(mean_sq);
         
-        printf("rtt min/avg/max/mdev = %.3f/%.3f/%.3f/%.3f ms\n", ping->rtt_min, avg, ping->rtt_max, mdev);
+        printf("round-trip min/avg/max/stddev = %.3f/%.3f/%.3f/%.3f ms\n", ping->rtt_min, avg, ping->rtt_max, mdev);
     }
 }
