@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
+/*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 12:43:44 by cpoulain          #+#    #+#             */
-/*   Updated: 2025/11/25 17:00:51 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/26 10:57:30 by guphilip         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,10 +95,37 @@ static int executing_loop(t_ping *ping)
 			break;
 		}
 
-		double rtt;
-		int ttl, _bytes;
+		// receive loop avec timeout de 1s
+		double rtt = 0.0;
+		int ttl = 0, _bytes = 0;
 		struct sockaddr_in from;
-		int r = receive_packet(ping, &rtt, &ttl, &_bytes, &from);
+		int r = RPL_TIMEO;
+		
+		struct timeval timeout_start;
+		gettimeofday(&timeout_start, NULL);
+		
+		while (!g_stop)
+		{
+			r = receive_packet(ping, &rtt, &ttl, &_bytes, &from);
+			
+			if (r == RPL_ECHO || r == RPL_TTL_EXCEEDED)
+				break; // reponse recue pour notre paquet
+				
+			if (r != RPL_TIMEO && r != RPL_NOECHO)
+				break; // error
+				
+			// verif timeout
+			struct timeval now;
+			gettimeofday(&now, NULL);
+			double elapsed = timeval_diff_ms(&timeout_start, &now);
+			if (elapsed > 1000.0) // 1s
+			{
+				r = RPL_TIMEO;
+				break;
+			}
+			
+			usleep(1000); // sleep pour eviter le flood
+		}
 
 		if (r == RPL_ECHO)
 		{
@@ -106,13 +133,27 @@ static int executing_loop(t_ping *ping)
 			if (!ping->args.quiet)
 				print_reply(ping, _bytes, ttl, rtt);
 		}
+		else if (r == RPL_TTL_EXCEEDED)
+		{
+			// Ttl execeeded pour notre paquet - afiichage du RTT
+			if (rtt > 0.0)
+				printf("From %s: Time to live exceeded (time=%.3f ms)\n", 
+				       ping->resolved_target, rtt);
+			else
+				print_ttl_exceeded(ping, _bytes);
+				
+			if (ping->args.verbose && ping->len > 0)
+				print_ttl_exceeded_dump(ping);
+		}
 		else if (r == RPL_TIMEO)
 		{
-			(void)r;
+			// timeout - pas de reponse
+			if (!ping->args.quiet)
+				printf("Request timeout for icmp_seq %u\n", ping->seq);
 		}
 		else if (r == RPL_NOECHO)
 		{
-			print_ttl_exceeded(ping, _bytes);
+			// useless maintenant ? 
 		}
 		else
 			break;

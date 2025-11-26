@@ -6,7 +6,7 @@
 /*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 14:22:10 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/25 17:01:14 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/25 16:39:54 by guphilip         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,6 @@ void stats_print(const t_ping *ping)
         
         double mdev = sqrt(mean_sq);
         
-        printf("rtt min/avg/max/mdev = %.3f/%.3f/%.3f/%.3f ms\n", ping->rtt_min, avg, ping->rtt_max, mdev);
+        printf("round-trip min/avg/max/stddev = %.3f/%.3f/%.3f/%.3f ms\n", ping->rtt_min, avg, ping->rtt_max, mdev);
     }
 }

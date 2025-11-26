@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_ping.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
+/*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 12:36:58 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/25 16:53:03 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/26 10:18:57 by guphilip         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 #define RPL_ECHO 0
 #define RPL_TIMEO 1
 #define RPL_NOECHO 2
+#define RPL_TTL_EXCEEDED 3
 
 #define VERBOSE_DESC "verbose output"
 #define QUIET_DESC "quiet output"
@@ -61,6 +62,10 @@ typedef struct s_ping
     double      rtt_max;
     double      rtt_sum;
     double      rtt_sum2;
+    struct iphdr data;
+    struct icmphdr *icmp_hdr;
+    struct icmphdr *icmp_hdr_copy;
+    ssize_t     len;
 }   t_ping;
 
 void    init_ping(t_ping *ping);
