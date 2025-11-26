@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   linker.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
+/*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 11:21:24 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/25 15:47:59 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/26 09:47:38 by guphilip         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 #include <netinet/ip.h>
 #include <netinet/ip_icmp.h>
 #include <sys/time.h>
+#include <time.h>
 #include <errno.h>
 #include <math.h>
 #include <float.h>
@@ -44,6 +45,7 @@ void        stats_print(const t_ping *ping);
 double      timeval_diff_ms(struct timeval *start, struct timeval *end);
 void        print_reply(t_ping *ping, int bytes, int ttl, double rtt);
 void        print_ttl_exceeded(t_ping *ping, int bytes);
+void        print_ttl_exceeded_dump(t_ping *ping);
 int         validate_int_min_max(int value, int min, int max);
 
 #endif

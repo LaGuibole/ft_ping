@@ -6,7 +6,7 @@
 /*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/25 13:33:44 by cpoulain          #+#    #+#             */
-/*   Updated: 2025/11/25 15:36:47 by guphilip         ###   ########.fr       */
+/*   Updated: 2025/11/25 18:35:00 by guphilip         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,4 +27,8 @@ void init_ping(t_ping *ping)
     ping->seq = -1;
     ping->args.interval = 1;
     ping->args.ttl = 0;
+    ping->data = (struct iphdr){0};
+    ping->icmp_hdr = NULL;
+    ping->icmp_hdr_copy = NULL;
+    ping->len = 0;
 }
