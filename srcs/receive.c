@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   receive.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 13:54:06 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/26 11:02:03 by guphilip         ###   ########.fr       */
+/*   Updated: 2025/11/26 11:44:29 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,10 +94,7 @@ int receive_packet(t_ping *ping, double *out_rtt, int *out_ttl, int *out_bytes, 
         }
         // notre paquet, on copie pour le dump ttl
         ping->data = *inner_ip;
-        
-        static struct icmphdr icmp_copy;
-        icmp_copy = *inner_icmp;
-        ping->icmp_hdr = &icmp_copy;
+        ping->icmp_hdr_copy = *inner_icmp;
         ping->len = (int)inner_available;
         
         // calcul RTT

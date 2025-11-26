@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 14:22:56 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/26 10:24:12 by guphilip         ###   ########.fr       */
+/*   Updated: 2025/11/26 11:45:34 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,14 +44,34 @@ void print_reply(t_ping *ping, int bytes, int ttl, double rtt)
 
 void print_ttl_exceeded(t_ping *ping, int bytes)
 {
-    printf("%d bytes from %s: Time to live exceeded\n",
-           bytes,
-           ping->resolved_target);
+    char *ip_str = ping->replier_ip[0] == '\0' ? ping->resolved_target : ping->replier_ip;
+    char hostname[NI_MAXHOST] = {0};
+    
+    // Try reverse DNS lookup
+    struct sockaddr_in addr;
+    memset(&addr, 0, sizeof(addr));
+    addr.sin_family = AF_INET;
+    inet_pton(AF_INET, ip_str, &addr.sin_addr);
+    
+    int result = getnameinfo((struct sockaddr *)&addr, sizeof(addr),
+                            hostname, sizeof(hostname),
+                            NULL, 0, 0);
+    
+    if (result == 0 && hostname[0] != '\0' && strcmp(hostname, ip_str) != 0)
+    {
+        printf("%d bytes from %s (%s): Time to live exceeded\n",
+               bytes, hostname, ip_str);
+    }
+    else
+    {
+        printf("%d bytes from %s: Time to live exceeded\n",
+               bytes, ip_str);
+    }
 }
 
 void print_ttl_exceeded_dump(t_ping *ping)
 {
-    if (!ping || ping->len <= 0 || !ping->icmp_hdr)
+    if (!ping || ping->len <= 0 || memcmp(&ping->icmp_hdr_copy, &(struct icmphdr){0}, sizeof(struct icmphdr)) == 0)
         return;
     
     int ip_hlen = ping->data.ihl * 4;
@@ -89,12 +109,12 @@ void print_ttl_exceeded_dump(t_ping *ping)
 
     if (ping->len >= ip_hlen + (int)sizeof(struct icmphdr))
     {
-        uint16_t inner_id = ntohs(ping->icmp_hdr->un.echo.id);
-        uint16_t inner_seq = ntohs(ping->icmp_hdr->un.echo.sequence);
+        uint16_t inner_id = ntohs(ping->icmp_hdr_copy.un.echo.id);
+        uint16_t inner_seq = ntohs(ping->icmp_hdr_copy.un.echo.sequence);
         int inner_size = tot_len - ip_hlen;
         printf("ICMP: type %d, code %d, size %d, id 0x%04x, seq 0x%04x\n",
-               ping->icmp_hdr->type,
-               ping->icmp_hdr->code,
+               ping->icmp_hdr_copy.type,
+               ping->icmp_hdr_copy.code,
                inner_size,
                inner_id,
                inner_seq);

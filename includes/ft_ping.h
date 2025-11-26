@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_ping.h                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 12:36:58 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/26 10:18:57 by guphilip         ###   ########.fr       */
+/*   Updated: 2025/11/26 11:39:25 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ typedef struct s_ping
     int         sockfd;
     struct      sockaddr_in target;
     char        resolved_target[INET6_ADDRSTRLEN];
+    char        replier_ip[INET6_ADDRSTRLEN];
     t_args      args;
     ArgParser   parser;
     uint16_t    id;
@@ -64,7 +65,7 @@ typedef struct s_ping
     double      rtt_sum2;
     struct iphdr data;
     struct icmphdr *icmp_hdr;
-    struct icmphdr *icmp_hdr_copy;
+    struct icmphdr icmp_hdr_copy;
     ssize_t     len;
 }   t_ping;
 

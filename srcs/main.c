@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 12:43:44 by cpoulain          #+#    #+#             */
-/*   Updated: 2025/11/26 10:57:30 by guphilip         ###   ########.fr       */
+/*   Updated: 2025/11/26 11:44:49 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,25 +135,19 @@ static int executing_loop(t_ping *ping)
 		}
 		else if (r == RPL_TTL_EXCEEDED)
 		{
-			// Ttl execeeded pour notre paquet - afiichage du RTT
-			if (rtt > 0.0)
-				printf("From %s: Time to live exceeded (time=%.3f ms)\n", 
-				       ping->resolved_target, rtt);
-			else
-				print_ttl_exceeded(ping, _bytes);
-				
+            inet_ntop(AF_INET, &from.sin_addr, ping->replier_ip, sizeof(ping->replier_ip));
+			print_ttl_exceeded(ping, _bytes);
 			if (ping->args.verbose && ping->len > 0)
 				print_ttl_exceeded_dump(ping);
+			memset(ping->replier_ip, 0, sizeof(ping->replier_ip));
+			memset(&ping->icmp_hdr_copy, 0, sizeof(struct icmphdr));
 		}
 		else if (r == RPL_TIMEO)
 		{
+			//DEBUG
 			// timeout - pas de reponse
-			if (!ping->args.quiet)
-				printf("Request timeout for icmp_seq %u\n", ping->seq);
-		}
-		else if (r == RPL_NOECHO)
-		{
-			// useless maintenant ? 
+			// if (!ping->args.quiet)
+			// 	printf("Request timeout for icmp_seq %u\n", ping->seq);
 		}
 		else
 			break;
