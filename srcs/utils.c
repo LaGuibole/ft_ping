@@ -6,7 +6,7 @@
 /*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 14:22:56 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/25 18:44:15 by guphilip         ###   ########.fr       */
+/*   Updated: 2025/11/26 10:24:12 by guphilip         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,16 @@ static void print_hex_line(const uint8_t *buffer, ssize_t len);
 /// @return La difference start - end exprime en ms
 double timeval_diff_ms(struct timeval *start, struct timeval *end)
 {
-    return (double)(end->tv_sec - start->tv_sec) * 1000 + 
-            (double)(end->tv_usec - start->tv_usec) / 1000;
+    long sec_diff = end->tv_sec - start->tv_sec;
+    long usec_diff = end->tv_usec - start->tv_usec;
+    
+    // gestion du report pour les reception autre paquet
+    if (usec_diff < 0) {
+        sec_diff--;
+        usec_diff += 1000000;
+    }
+    
+    return (double)sec_diff * 1000.0 + (double)usec_diff / 1000.0;
 }
 
 void print_reply(t_ping *ping, int bytes, int ttl, double rtt)
@@ -43,7 +51,6 @@ void print_ttl_exceeded(t_ping *ping, int bytes)
 
 void print_ttl_exceeded_dump(t_ping *ping)
 {
-    /* Vérifications de sécurité */
     if (!ping || ping->len <= 0 || !ping->icmp_hdr)
         return;
     
@@ -51,7 +58,6 @@ void print_ttl_exceeded_dump(t_ping *ping)
     uint16_t tot_len = ntohs(ping->data.tot_len);
     uint16_t id = ntohs(ping->data.id);
     
-    /* CORRECTION: frag_off est dans l'en-tête IP, pas ICMP */
     uint16_t frag = ntohs(ping->data.frag_off);
     int flags = (frag & 0xE000) >> 13;
     int offset = frag & 0x1FFF;
@@ -70,15 +76,15 @@ void print_ttl_exceeded_dump(t_ping *ping)
     printf(" %u  %u  %02x %04x %04x   %u %04x  %02u  %02u %04x  %s  %s \n",
         ping->data.version,
         ping->data.ihl,
-        ping->data.tos,  /* déjà un uint8_t */
-        tot_len,         /* CORRECTION: %04x au lieu de %04u */
+        ping->data.tos,  
+        tot_len,        
         id,
         flags,
         offset,
-        ping->data.ttl,  /* CORRECTION: utilise le TTL de l'en-tête IP, pas args.ttl */
+        ping->data.ttl,
         ping->data.protocol,
         ntohs(ping->data.check),
-        src,  /* CORRECTION: src puis dest dans le bon ordre */
+        src,
         dest);
 
     if (ping->len >= ip_hlen + (int)sizeof(struct icmphdr))
@@ -87,8 +93,8 @@ void print_ttl_exceeded_dump(t_ping *ping)
         uint16_t inner_seq = ntohs(ping->icmp_hdr->un.echo.sequence);
         int inner_size = tot_len - ip_hlen;
         printf("ICMP: type %d, code %d, size %d, id 0x%04x, seq 0x%04x\n",
-               ping->icmp_hdr->type,     /* CORRECTION: type/code sont des uint8_t */
-               ping->icmp_hdr->code,     /* pas de ntohs sur des octets */
+               ping->icmp_hdr->type,
+               ping->icmp_hdr->code,
                inner_size,
                inner_id,
                inner_seq);
@@ -102,7 +108,7 @@ int validate_int_min_max(int value, int min, int max)
     return 0;
 }
 
-// // static declarations
+//  static declarations
 
 static void print_hex_line(const uint8_t *buffer, ssize_t len)
 {

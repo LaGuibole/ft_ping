@@ -6,7 +6,7 @@
 /*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 12:36:58 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/25 18:35:00 by guphilip         ###   ########.fr       */
+/*   Updated: 2025/11/26 10:18:57 by guphilip         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 #define RPL_ECHO 0
 #define RPL_TIMEO 1
 #define RPL_NOECHO 2
+#define RPL_TTL_EXCEEDED 3
 
 typedef struct s_args
 {

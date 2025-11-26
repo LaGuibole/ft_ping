@@ -6,7 +6,7 @@
 /*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 11:21:24 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/25 17:47:38 by guphilip         ###   ########.fr       */
+/*   Updated: 2025/11/26 09:47:38 by guphilip         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 #include <netinet/ip.h>
 #include <netinet/ip_icmp.h>
 #include <sys/time.h>
+#include <time.h>
 #include <errno.h>
 #include <math.h>
 #include <float.h>
