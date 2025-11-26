@@ -6,7 +6,7 @@
 /*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 14:22:56 by guphilip          #+#    #+#             */
-/*   Updated: 2025/11/26 11:45:34 by cpoulain         ###   ########.fr       */
+/*   Updated: 2025/11/26 11:49:17 by cpoulain         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,12 +34,25 @@ double timeval_diff_ms(struct timeval *start, struct timeval *end)
 
 void print_reply(t_ping *ping, int bytes, int ttl, double rtt)
 {
-    printf("%d bytes from %s: icmp_seq=%u ttl=%d time=%.3f ms\n",
-           bytes,
-           ping->resolved_target,
-           ping->seq,
-           ttl,
-           rtt);
+    if (rtt >= 0.0)
+    {
+        // Afficher avec le temps RTT
+        printf("%d bytes from %s: icmp_seq=%u ttl=%d time=%.3f ms\n",
+               bytes,
+               ping->resolved_target,
+               ping->seq,
+               ttl,
+               rtt);
+    }
+    else
+    {
+        // Afficher sans le temps RTT
+        printf("%d bytes from %s: icmp_seq=%u ttl=%d\n",
+               bytes,
+               ping->resolved_target,
+               ping->seq,
+               ttl);
+    }
 }
 
 void print_ttl_exceeded(t_ping *ping, int bytes)

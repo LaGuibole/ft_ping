@@ -59,15 +59,26 @@ int build_icmp_echo(t_ping *ping, uint8_t *buffer, uint16_t id, uint16_t seq)
     icmp_hdr->un.echo.id = htons(id);
     icmp_hdr->un.echo.sequence = htons(seq);
     
-    // payload, on fout le timestamp au debut du payload pour les calculs de RTT
-    struct timeval now;
-    gettimeofday(&now, NULL);
     uint8_t *payload = buffer + sizeof(struct icmphdr);
-    memcpy(payload, &now, sizeof(now));
-
     int payload_len = ping->args.packet_size;
-    for (int i = sizeof(now); i < payload_len; ++i)
-        payload[i] = (uint8_t)(i & 0xFF);
+    
+    // Seulement ajouter timestamp si assez de place (>=16 bytes comme inetutils)
+    if (payload_len >= (int)sizeof(struct timeval))
+    {
+        struct timeval now;
+        gettimeofday(&now, NULL);
+        memcpy(payload, &now, sizeof(now));
+        
+        // Remplir le reste avec un pattern
+        for (int i = sizeof(now); i < payload_len; ++i)
+            payload[i] = (uint8_t)(i & 0xFF);
+    }
+    else
+    {
+        // Pas assez de place pour le timestamp, juste un pattern
+        for (int i = 0; i < payload_len; ++i)
+            payload[i] = (uint8_t)(i & 0xFF);
+    }
     
     int total_len = sizeof(struct icmphdr) + payload_len;
     icmp_hdr->checksum = checksum((void *)icmp_hdr, total_len);

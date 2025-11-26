@@ -28,7 +28,7 @@ int receive_packet(t_ping *ping, double *out_rtt, int *out_ttl, int *out_bytes, 
     struct timeval tv_recv;
     
     // Initialize output parameters
-    if (out_rtt) *out_rtt = 0.0;
+    if (out_rtt) *out_rtt = -1.0; // -1 = pas de timing disponible
     if (out_ttl) *out_ttl = 0;
     if (out_bytes) *out_bytes = 0;
     if (out_from) memset(out_from, 0, sizeof(*out_from));
@@ -122,12 +122,18 @@ int receive_packet(t_ping *ping, double *out_rtt, int *out_ttl, int *out_bytes, 
     // reponse au paquet courant ? 
     if (ntohs(icmp_hdr->un.echo.sequence) != ping->seq)
         return RPL_NOECHO;
-    uint8_t *payload = (uint8_t *)icmp_hdr + sizeof(struct icmphdr);
-    struct timeval *tv_sent = (struct timeval *)payload;
-
-    double rtt = timeval_diff_ms(tv_sent, &tv_recv);   
-    if (out_rtt)
-        *out_rtt = rtt;
+        
+    // Calculer RTT seulement si assez de place pour le timestamp
+    int payload_len = nbytes - ip_hlen - sizeof(struct icmphdr);
+    if (payload_len >= (int)sizeof(struct timeval))
+    {
+        uint8_t *payload = (uint8_t *)icmp_hdr + sizeof(struct icmphdr);
+        struct timeval *tv_sent = (struct timeval *)payload;
+        double rtt = timeval_diff_ms(tv_sent, &tv_recv);   
+        if (out_rtt)
+            *out_rtt = rtt;
+    }
+    // sinon out_rtt reste à -1
         
     return RPL_ECHO;
 }

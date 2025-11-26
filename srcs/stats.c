@@ -35,13 +35,17 @@ void stats_update(t_ping *ping, double rtt)
         return ;
     ping->received += 1;
     
-    if (rtt < ping->rtt_min)
-        ping->rtt_min = rtt;
-    if (rtt > ping->rtt_max)
-        ping->rtt_max = rtt;
-    
-    ping->rtt_sum += rtt;
-    ping->rtt_sum2 += rtt * rtt;
+    // Seulement mettre à jour les stats RTT si le timing est disponible
+    if (rtt >= 0.0)
+    {
+        if (rtt < ping->rtt_min)
+            ping->rtt_min = rtt;
+        if (rtt > ping->rtt_max)
+            ping->rtt_max = rtt;
+        
+        ping->rtt_sum += rtt;
+        ping->rtt_sum2 += rtt * rtt;
+    }
 }
 
 /// @brief Affiche les stats gloables de ping a la fin de l'execution
@@ -60,7 +64,8 @@ void stats_print(const t_ping *ping)
     printf("--- %s ping statistics ---\n", ping->args.target_str);
     printf("%d packets transmitted, %d packets received, %.0f%% packet loss\n", tx, rx, loss);
 
-    if (rx > 0)
+    // Seulement afficher les stats RTT si on a des mesures valides
+    if (rx > 0 && ping->rtt_sum > 0.0)
     {
         double avg = ping->rtt_sum / rx;
 
