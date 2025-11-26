@@ -17,14 +17,23 @@
 # include <netinet/in.h>
 # include "argparser.h"
 
-#define PAYLOAD_SIZE 56
+#define DEFAULT_PAYLOAD_SIZE 56
 #define RECV_BUF_SIZE 1500
-#define OPTION_COUNT 5
+#define OPTION_COUNT 7
 
 #define RPL_ECHO 0
 #define RPL_TIMEO 1
 #define RPL_NOECHO 2
 #define RPL_TTL_EXCEEDED 3
+
+#define VERBOSE_DESC "verbose output"
+#define QUIET_DESC "quiet output"
+#define HELP_DESC "give this help list"
+#define TTL_DESC "specify N as time-to-live"
+#define SIZE_DESC "Specifies the number of data bytes to be sent. The default is 56, which translates into 64 ICMP data bytes, taking the 8 bytes of ICMP header data into account."
+#define COUNT_DESC "Stop after sending and receiving answers to a total of n packets."
+#define INTERVAL_DESC "Wait n seconds until sending next packet. The default is to wait for one second between packets. This option is incompatible with the option -f."
+
 
 typedef struct s_args
 {
@@ -34,6 +43,8 @@ typedef struct s_args
     byte        quiet;
     double      interval;
     int         ttl;
+    int         packet_count;
+    int         packet_size;
 }   t_args;
 
 typedef struct s_ping

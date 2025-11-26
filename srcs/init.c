@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   init.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: guphilip <guphilip@student.42.fr>          +#+  +:+       +#+        */
+/*   By: cpoulain <cpoulain@student.42lehavre.fr    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/25 13:33:44 by cpoulain          #+#    #+#             */
 /*   Updated: 2025/11/25 18:35:00 by guphilip         ###   ########.fr       */
@@ -27,6 +27,8 @@ void init_ping(t_ping *ping)
     ping->seq = -1;
     ping->args.interval = 1;
     ping->args.ttl = 0;
+    ping->args.packet_count = 0;
+    ping->args.packet_size = DEFAULT_PAYLOAD_SIZE;
     ping->data = (struct iphdr){0};
     ping->icmp_hdr = NULL;
     ping->icmp_hdr_copy = NULL;
